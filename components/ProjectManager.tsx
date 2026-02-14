@@ -9,9 +9,10 @@ interface ProjectManagerProps {
   currentProjectId: string;
   setCurrentProjectId: (id: string) => void;
   resources: Resource[];
+  currentUser: Resource | null;
 }
 
-const ProjectManager: React.FC<ProjectManagerProps> = ({ projects, setProjects, currentProjectId, setCurrentProjectId, resources }) => {
+const ProjectManager: React.FC<ProjectManagerProps> = ({ projects, setProjects, currentProjectId, setCurrentProjectId, resources, currentUser }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
 
@@ -28,10 +29,18 @@ const ProjectManager: React.FC<ProjectManagerProps> = ({ projects, setProjects, 
     notes: ''
   });
 
+  const canCreateProject = currentUser?.classification === 'Admin' || currentUser?.role === 'PM';
+
+  const canEditProject = (project: Project) => {
+    if (!currentUser) return false;
+    if (currentUser.classification === 'Admin') return true;
+    return project.managerId === currentUser.id || project.plId === currentUser.id;
+  };
+
   const openAddModal = () => {
     const defaultClient = resources.find(r => r.classification === 'Client');
-    const internalResources = resources.filter(r => r.classification === 'Internal');
-    const defaultPM = internalResources[0];
+    const employeeResources = resources.filter(r => r.classification === 'Employee');
+    const defaultPM = employeeResources[0];
 
     setEditingProject(null);
     setFormData({
@@ -58,8 +67,10 @@ const ProjectManager: React.FC<ProjectManagerProps> = ({ projects, setProjects, 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (editingProject) {
+      if (!canEditProject(editingProject)) return;
       setProjects(prev => prev.map(p => p.id === editingProject.id ? { ...p, ...formData } as Project : p));
     } else {
+      if (!canCreateProject) return;
       setProjects(prev => [...prev, formData as Project]);
     }
     setIsModalOpen(false);
@@ -80,7 +91,7 @@ const ProjectManager: React.FC<ProjectManagerProps> = ({ projects, setProjects, 
   };
 
   const clients = resources.filter(r => r.classification === 'Client');
-  const internals = resources.filter(r => r.classification === 'Internal');
+  const employees = resources.filter(r => r.classification === 'Employee');
 
   return (
     <div className="space-y-10 animate-in slide-in-from-bottom-4 duration-500 max-w-6xl mx-auto pb-12">
@@ -89,13 +100,15 @@ const ProjectManager: React.FC<ProjectManagerProps> = ({ projects, setProjects, 
           <h2 className="text-3xl font-black text-slate-800 tracking-tight">프로젝트 센터</h2>
           <p className="text-slate-500 text-sm font-bold mt-1 uppercase tracking-tight">Enterprise Workspace Management</p>
         </div>
-        <button
-          onClick={openAddModal}
-          className="px-6 py-3.5 bg-indigo-600 text-white font-black rounded-2xl text-sm hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-100/50 flex items-center gap-3 active:scale-[0.98]"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
-          새 프로젝트 등록
-        </button>
+        {canCreateProject && (
+          <button
+            onClick={openAddModal}
+            className="px-6 py-3.5 bg-indigo-600 text-white font-black rounded-2xl text-sm hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-100/50 flex items-center gap-3 active:scale-[0.98]"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+            새 프로젝트 등록
+          </button>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
@@ -103,6 +116,7 @@ const ProjectManager: React.FC<ProjectManagerProps> = ({ projects, setProjects, 
           const isActive = p.id === currentProjectId;
           const manager = resources.find(r => r.id === p.managerId);
           const client = resources.find(r => r.id === p.clientId);
+          const canEdit = canEditProject(p);
 
           return (
             <div
@@ -159,18 +173,20 @@ const ProjectManager: React.FC<ProjectManagerProps> = ({ projects, setProjects, 
                     onClick={() => setCurrentProjectId(p.id)}
                     disabled={isActive}
                     className={`flex-1 py-3.5 rounded-2xl text-[13px] font-black transition-all active:scale-[0.98] ${isActive
-                        ? 'bg-slate-100 text-slate-400 cursor-default shadow-none border border-slate-200'
-                        : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-xl shadow-indigo-100/30'
+                      ? 'bg-slate-100 text-slate-400 cursor-default shadow-none border border-slate-200'
+                      : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-xl shadow-indigo-100/30'
                       }`}
                   >
                     {isActive ? '현재 사용 중' : '워크스페이스 전환'}
                   </button>
-                  <button
-                    onClick={() => openEditModal(p)}
-                    className="px-5 py-3.5 bg-white text-slate-400 rounded-2xl hover:bg-slate-50 hover:text-slate-800 transition-all border-2 border-slate-100 group-hover:border-slate-200 active:scale-[0.98]"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125" /></svg>
-                  </button>
+                  {canEdit && (
+                    <button
+                      onClick={() => openEditModal(p)}
+                      className="px-5 py-3.5 bg-white text-slate-400 rounded-2xl hover:bg-slate-50 hover:text-slate-800 transition-all border-2 border-slate-100 group-hover:border-slate-200 active:scale-[0.98]"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125" /></svg>
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
@@ -190,69 +206,73 @@ const ProjectManager: React.FC<ProjectManagerProps> = ({ projects, setProjects, 
             </div>
 
             <form onSubmit={handleSubmit} className="p-8 space-y-5 max-h-[85vh] overflow-y-auto custom-scrollbar">
-              <div className="grid grid-cols-2 gap-5">
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-black text-indigo-500 uppercase tracking-widest ml-1">Project ID</label>
-                  <input required type="text" className="w-full px-5 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl text-[14px] font-black text-slate-800 focus:border-indigo-500 focus:bg-white outline-none transition-all" value={formData.id} onChange={e => setFormData({ ...formData, id: e.target.value })} />
+              <fieldset disabled={editingProject ? !canEditProject(editingProject) : !canCreateProject} className="space-y-5">
+                <div className="grid grid-cols-2 gap-5">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-black text-indigo-500 uppercase tracking-widest ml-1">Project ID</label>
+                    <input required type="text" className="w-full px-5 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl text-[14px] font-black text-slate-800 focus:border-indigo-500 focus:bg-white outline-none transition-all" value={formData.id} onChange={e => setFormData({ ...formData, id: e.target.value })} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-black text-indigo-500 uppercase tracking-widest ml-1">Project Name</label>
+                    <input required type="text" className="w-full px-5 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl text-[14px] font-black text-slate-800 focus:border-indigo-500 focus:bg-white outline-none transition-all" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} />
+                  </div>
                 </div>
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-black text-indigo-500 uppercase tracking-widest ml-1">Project Name</label>
-                  <input required type="text" className="w-full px-5 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl text-[14px] font-black text-slate-800 focus:border-indigo-500 focus:bg-white outline-none transition-all" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} />
-                </div>
-              </div>
 
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Description (주요 목표)</label>
-                <textarea required className="w-full px-5 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl text-[13px] font-bold text-slate-700 focus:border-indigo-500 focus:bg-white outline-none transition-all h-20 resize-none leading-relaxed" value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} />
-              </div>
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Description (주요 목표)</label>
+                  <textarea required className="w-full px-5 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl text-[13px] font-bold text-slate-700 focus:border-indigo-500 focus:bg-white outline-none transition-all h-20 resize-none leading-relaxed" value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} />
+                </div>
 
-              <div className="grid grid-cols-2 gap-5">
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Start Date</label>
-                  <input type="date" className="w-full px-5 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl text-[13px] font-bold text-slate-700" value={formData.startDate} onChange={e => setFormData({ ...formData, startDate: e.target.value })} />
+                <div className="grid grid-cols-2 gap-5">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Start Date</label>
+                    <input type="date" className="w-full px-5 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl text-[13px] font-bold text-slate-700" value={formData.startDate} onChange={e => setFormData({ ...formData, startDate: e.target.value })} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">End Date</label>
+                    <input type="date" className="w-full px-5 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl text-[13px] font-bold text-slate-700" value={formData.endDate} onChange={e => setFormData({ ...formData, endDate: e.target.value })} />
+                  </div>
                 </div>
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">End Date</label>
-                  <input type="date" className="w-full px-5 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl text-[13px] font-bold text-slate-700" value={formData.endDate} onChange={e => setFormData({ ...formData, endDate: e.target.value })} />
-                </div>
-              </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Client (고객사/담당자)</label>
-                  <select className="w-full px-5 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl text-[12px] font-bold text-slate-800 outline-none appearance-none" value={formData.clientId} onChange={e => setFormData({ ...formData, clientId: e.target.value })}>
-                    {clients.map(res => (
-                      <option key={res.id} value={res.id}>{res.name} ({res.department})</option>
-                    ))}
-                  </select>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Client (고객사/담당자)</label>
+                    <select className="w-full px-5 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl text-[12px] font-bold text-slate-800 outline-none appearance-none" value={formData.clientId} onChange={e => setFormData({ ...formData, clientId: e.target.value })}>
+                      {clients.map(res => (
+                        <option key={res.id} value={res.id}>{res.name} ({res.department})</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-black text-indigo-600 uppercase tracking-widest ml-1">PM (Project Manager)</label>
+                    <select className="w-full px-5 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl text-[12px] font-bold text-slate-800 outline-none appearance-none" value={formData.managerId} onChange={e => setFormData({ ...formData, managerId: e.target.value })}>
+                      {employees.filter(res => res.id !== formData.plId).map(res => (
+                        <option key={res.id} value={res.id}>{res.name} ({res.role})</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">PL (Project Leader)</label>
+                    <select className="w-full px-5 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl text-[12px] font-bold text-slate-800 outline-none appearance-none" value={formData.plId} onChange={e => setFormData({ ...formData, plId: e.target.value })}>
+                      <option value="">선택 안함</option>
+                      {employees.filter(res => res.id !== formData.managerId).map(res => (
+                        <option key={res.id} value={res.id}>{res.name} ({res.role})</option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-black text-indigo-600 uppercase tracking-widest ml-1">PM (Project Manager)</label>
-                  <select className="w-full px-5 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl text-[12px] font-bold text-slate-800 outline-none appearance-none" value={formData.managerId} onChange={e => setFormData({ ...formData, managerId: e.target.value })}>
-                    {internals.filter(res => res.id !== formData.plId).map(res => (
-                      <option key={res.id} value={res.id}>{res.name} ({res.role})</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">PL (Project Leader)</label>
-                  <select className="w-full px-5 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl text-[12px] font-bold text-slate-800 outline-none appearance-none" value={formData.plId} onChange={e => setFormData({ ...formData, plId: e.target.value })}>
-                    <option value="">선택 안함</option>
-                    {internals.filter(res => res.id !== formData.managerId).map(res => (
-                      <option key={res.id} value={res.id}>{res.name} ({res.role})</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
 
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Notes (참고사항)</label>
-                <textarea className="w-full px-5 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl text-[13px] font-bold text-slate-700 focus:border-indigo-500 focus:bg-white outline-none transition-all h-20 resize-none" placeholder="보안 규정, 특별 라이선스, 협력 업체 정보 등..." value={formData.notes} onChange={e => setFormData({ ...formData, notes: e.target.value })} />
-              </div>
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Notes (참고사항)</label>
+                  <textarea className="w-full px-5 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl text-[13px] font-bold text-slate-700 focus:border-indigo-500 focus:bg-white outline-none transition-all h-20 resize-none" placeholder="보안 규정, 특별 라이선스, 협력 업체 정보 등..." value={formData.notes} onChange={e => setFormData({ ...formData, notes: e.target.value })} />
+                </div>
+              </fieldset>
 
               <div className="pt-4 flex gap-4">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-3 bg-slate-100 text-slate-600 font-black rounded-xl hover:bg-slate-200 transition-all active:scale-[0.98] text-sm">취소하기</button>
-                <button type="submit" className="flex-1 py-3 bg-indigo-600 text-white font-black rounded-xl hover:bg-indigo-700 shadow-xl shadow-indigo-100/30 transition-all active:scale-[0.98] text-sm">프로젝트 저장</button>
+                <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-4 bg-slate-100 text-slate-600 font-black rounded-2xl hover:bg-slate-200 transition-all active:scale-[0.98] text-sm">취소하기</button>
+                {(editingProject ? canEditProject(editingProject) : canCreateProject) && (
+                  <button type="submit" className="flex-1 py-4 bg-indigo-600 text-white font-black rounded-2xl hover:bg-indigo-700 shadow-xl shadow-indigo-100/30 transition-all active:scale-[0.98] text-sm">프로젝트 저장</button>
+                )}
               </div>
             </form>
           </div>

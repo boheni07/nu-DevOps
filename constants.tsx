@@ -5,7 +5,7 @@ export const COLORS = {
   primary: '#4f46e5', // Indigo 600
   primaryHover: '#4338ca',
   secondary: '#0ea5e9', // Sky 500
-  danger: '#ef4444', 
+  danger: '#ef4444',
   success: '#10b981',
   warning: '#f59e0b',
   slate: {
@@ -97,6 +97,14 @@ export const ICONS = {
       <polyline points="9 19 12 22 15 19" />
       <line x1="2" y1="12" x2="22" y2="12" />
       <line x1="12" y1="2" x2="12" y2="22" />
+      <line x1="12" y1="2" x2="12" y2="22" />
+    </svg>
+  ),
+  Alert: (props: any) => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <circle cx="12" cy="12" r="10" />
+      <line x1="12" y1="8" x2="12" y2="12" />
+      <line x1="12" y1="16" x2="12.01" y2="16" />
     </svg>
   ),
 };

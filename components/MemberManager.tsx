@@ -1,15 +1,16 @@
 
 import React, { useState, useRef } from 'react';
-import { Resource, MemberStatus, ResourceClassification } from '../types';
+import { Resource, MemberStatus, ResourceClassification, UserOrganization } from '../types';
 import { ICONS } from '../constants';
 
 interface MemberManagerProps {
   resources: Resource[];
   setResources: React.Dispatch<React.SetStateAction<Resource[]>>;
   currentUser: Resource;
+  organizations: UserOrganization[];
 }
 
-const MemberManager: React.FC<MemberManagerProps> = ({ resources, setResources, currentUser }) => {
+const MemberManager: React.FC<MemberManagerProps> = ({ resources, setResources, currentUser, organizations }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [deptFilter, setDeptFilter] = useState('');
   const [classFilter, setClassFilter] = useState<ResourceClassification | ''>('');
@@ -22,15 +23,37 @@ const MemberManager: React.FC<MemberManagerProps> = ({ resources, setResources, 
   const [formData, setFormData] = useState<Partial<Resource>>({});
 
   const formatPhoneNumber = (value: string) => {
-    const digits = value.replace(/\D/g, "").slice(0, 11);
+    // 숫자만 추출
+    const digits = value.replace(/\D/g, "");
+
+    // 02 지역번호 처리
+    if (digits.startsWith('02')) {
+      if (digits.length <= 2) return digits;
+      if (digits.length <= 5) return `${digits.slice(0, 2)}-${digits.slice(2)}`;
+      if (digits.length <= 9) return `${digits.slice(0, 2)}-${digits.slice(2, 5)}-${digits.slice(5)}`; // 02-123-4567
+      return `${digits.slice(0, 2)}-${digits.slice(2, 6)}-${digits.slice(6, 10)}`; // 02-1234-5678
+    }
+
+    // 그 외 (010, 031, 062 등)
     if (digits.length <= 3) return digits;
-    if (digits.length <= 7) return `${digits.slice(0, 3)}-${digits.slice(3)}`;
-    return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`;
+    if (digits.length <= 6) return `${digits.slice(0, 3)}-${digits.slice(3)}`;
+    if (digits.length <= 10) return `${digits.slice(0, 3)}-${digits.slice(3, 6)}-${digits.slice(6)}`; // 010-123-4567
+    return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7, 11)}`; // 010-1234-5678
   };
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formatted = formatPhoneNumber(e.target.value);
     setFormData({ ...formData, phone: formatted });
+  };
+
+  const handleClassificationChange = (cls: ResourceClassification) => {
+    let newOrgName = formData.organizationName;
+    if (cls === 'Admin' || cls === 'Employee') {
+      newOrgName = organizations[0]?.name || '(주)넥서스 테크놀로지';
+    } else if (cls === 'Client' && (formData.classification === 'Admin' || formData.classification === 'Employee')) {
+      newOrgName = ''; // 내부에서 외부로 변경 시 초기화
+    }
+    setFormData({ ...formData, classification: cls, organizationName: newOrgName });
   };
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -50,7 +73,7 @@ const MemberManager: React.FC<MemberManagerProps> = ({ resources, setResources, 
       return false;
     }
 
-    const matchesSearch = 
+    const matchesSearch =
       res.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       res.role.toLowerCase().includes(searchTerm.toLowerCase()) ||
       res.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -68,7 +91,7 @@ const MemberManager: React.FC<MemberManagerProps> = ({ resources, setResources, 
     switch (cls) {
       case 'Admin': return 'bg-indigo-100 text-indigo-700 border-indigo-200';
       case 'Client': return 'bg-amber-100 text-amber-700 border-amber-200';
-      case 'Internal': return 'bg-slate-100 text-slate-700 border-slate-200';
+      case 'Employee': return 'bg-slate-100 text-slate-700 border-slate-200';
       default: return 'bg-slate-50 text-slate-400';
     }
   };
@@ -86,7 +109,8 @@ const MemberManager: React.FC<MemberManagerProps> = ({ resources, setResources, 
       email: '',
       phone: '',
       status: 'Active',
-      classification: 'Internal',
+      classification: 'Employee',
+      organizationName: organizations[0]?.name || '(주)넥서스 테크놀로지',
       joinDate: new Date().toISOString().split('T')[0],
       capacity: 40,
       avatar: `https://picsum.photos/seed/${Date.now()}/100/100`
@@ -128,7 +152,7 @@ const MemberManager: React.FC<MemberManagerProps> = ({ resources, setResources, 
           <h2 className="text-2xl font-black text-slate-800 tracking-tight">회원 관리 (Governance)</h2>
           <p className="text-slate-500 text-sm">시스템 접근 권한 및 회원 상세 정보를 관리합니다.</p>
         </div>
-        <button 
+        <button
           onClick={openAddModal}
           className="px-5 py-2.5 bg-indigo-600 text-white font-bold rounded-xl text-sm flex items-center gap-2 shadow-lg shadow-indigo-100/50 hover:bg-indigo-700 transition-all active:scale-[0.98]"
         >
@@ -139,9 +163,9 @@ const MemberManager: React.FC<MemberManagerProps> = ({ resources, setResources, 
 
       <div className="flex gap-4 items-center mb-4 overflow-x-auto pb-2">
         <div className="relative flex-1 min-w-[200px] max-w-md">
-          <input 
-            type="text" 
-            placeholder="이름, ID, 역할로 검색..." 
+          <input
+            type="text"
+            placeholder="이름, ID, 역할로 검색..."
             className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 outline-none transition-all shadow-sm"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -150,7 +174,7 @@ const MemberManager: React.FC<MemberManagerProps> = ({ resources, setResources, 
             <ICONS.Search className="w-4 h-4" />
           </div>
         </div>
-        <select 
+        <select
           className="px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-600 focus:ring-2 focus:ring-indigo-500 outline-none min-w-[140px] shadow-sm"
           value={classFilter}
           onChange={(e) => setClassFilter(e.target.value as any)}
@@ -158,9 +182,9 @@ const MemberManager: React.FC<MemberManagerProps> = ({ resources, setResources, 
           <option value="">모든 분류</option>
           <option value="Admin">관리자 (Admin)</option>
           <option value="Client">고객 (Client)</option>
-          <option value="Internal">내부 (Internal)</option>
+          <option value="Employee">임직원 (Employee)</option>
         </select>
-        <select 
+        <select
           className="px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-600 focus:ring-2 focus:ring-indigo-500 outline-none min-w-[140px] shadow-sm"
           value={deptFilter}
           onChange={(e) => setDeptFilter(e.target.value)}
@@ -198,8 +222,9 @@ const MemberManager: React.FC<MemberManagerProps> = ({ resources, setResources, 
                 </td>
                 <td className="px-3 py-4">
                   <span className={`px-2.5 py-1 rounded-lg border text-[9px] font-black uppercase tracking-wider ${getClassificationStyle(res.classification)}`}>
-                    {res.classification === 'Admin' ? '관리자' : res.classification === 'Client' ? '고객' : '내부'}
+                    {res.classification === 'Admin' ? '관리자' : res.classification === 'Client' ? '고객' : '임직원'}
                   </span>
+                  <div className="text-[10px] text-slate-500 font-medium mt-1 truncate max-w-[100px]">{res.organizationName}</div>
                 </td>
                 <td className="px-3 py-4">
                   <div className="text-xs text-slate-700 font-bold">{res.department}</div>
@@ -216,7 +241,7 @@ const MemberManager: React.FC<MemberManagerProps> = ({ resources, setResources, 
                 </td>
                 <td className="pr-8 py-4 text-right">
                   <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button 
+                    <button
                       onClick={() => openEditModal(res)}
                       className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all"
                       title="정보 수정"
@@ -226,7 +251,7 @@ const MemberManager: React.FC<MemberManagerProps> = ({ resources, setResources, 
                       </svg>
                     </button>
                     {res.classification !== 'Admin' && (
-                      <button 
+                      <button
                         onClick={() => handleDelete(res.id)}
                         className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all"
                         title="회원 삭제"
@@ -254,7 +279,7 @@ const MemberManager: React.FC<MemberManagerProps> = ({ resources, setResources, 
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
               </button>
             </div>
-            
+
             <form onSubmit={handleSubmit} className="p-10 space-y-6 max-h-[75vh] overflow-y-auto custom-scrollbar">
               <div className="flex flex-col items-center gap-4 mb-4">
                 <div className="relative group">
@@ -270,77 +295,84 @@ const MemberManager: React.FC<MemberManagerProps> = ({ resources, setResources, 
                 <div className="col-span-2">
                   <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">회원 분류</label>
                   <div className="grid grid-cols-3 gap-2">
-                    {(['Admin', 'Client', 'Internal'] as ResourceClassification[]).map(cls => (
+                    {(['Admin', 'Client', 'Employee'] as ResourceClassification[]).map(cls => (
                       <button
                         key={cls}
                         type="button"
                         disabled={editingMember?.classification === 'Admin'} // Admin 계정의 분류 수정 방지
-                        onClick={() => setFormData({...formData, classification: cls})}
-                        className={`py-3 rounded-2xl border-2 text-[10px] font-black transition-all ${
-                          formData.classification === cls 
-                            ? 'border-indigo-600 bg-indigo-50 text-indigo-600 shadow-md' 
-                            : 'border-slate-100 bg-slate-50 text-slate-400 hover:border-slate-200'
-                        } ${editingMember?.classification === 'Admin' ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        onClick={() => handleClassificationChange(cls)}
+                        className={`py-3 rounded-2xl border-2 text-[10px] font-black transition-all ${formData.classification === cls
+                          ? 'border-indigo-600 bg-indigo-50 text-indigo-600 shadow-md'
+                          : 'border-slate-100 bg-slate-50 text-slate-400 hover:border-slate-200'
+                          } ${editingMember?.classification === 'Admin' ? 'opacity-50 cursor-not-allowed' : ''}`}
                       >
-                        {cls === 'Admin' ? '관리자' : cls === 'Client' ? '고객' : '내부'}
+                        {cls === 'Admin' ? '관리자' : cls === 'Client' ? '고객' : '임직원'}
                       </button>
                     ))}
                   </div>
                 </div>
+
                 <div>
                   <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">로그인 ID</label>
-                  <input required disabled={editingMember?.classification === 'Admin'} type="text" className={`w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-bold focus:border-indigo-500 focus:bg-white outline-none transition-all ${editingMember?.classification === 'Admin' ? 'opacity-50' : ''}`} value={formData.loginId || ''} onChange={e => setFormData({...formData, loginId: e.target.value})} />
+                  <input required disabled={editingMember?.classification === 'Admin'} type="text" className={`w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-bold focus:border-indigo-500 focus:bg-white outline-none transition-all ${editingMember?.classification === 'Admin' ? 'opacity-50' : ''}`} value={formData.loginId || ''} onChange={e => setFormData({ ...formData, loginId: e.target.value })} />
                 </div>
+
                 <div>
                   <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">비밀번호</label>
                   <div className="relative">
-                    <input type={showPassword ? "text" : "password"} className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-bold focus:border-indigo-500 focus:bg-white outline-none transition-all pr-12" value={formData.password || ''} onChange={e => setFormData({...formData, password: e.target.value})} />
+                    <input type={showPassword ? "text" : "password"} className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-bold focus:border-indigo-500 focus:bg-white outline-none transition-all pr-12" value={formData.password || ''} onChange={e => setFormData({ ...formData, password: e.target.value })} />
                     <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-4.5 text-slate-400 hover:text-indigo-600">
                       {showPassword ? (
-                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.888 9.888L3 3m18 18l-6.888-6.888m0 0a10.05 10.05 0 01-1.112.063c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242"/></svg>
+                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.888 9.888L3 3m18 18l-6.888-6.888m0 0a10.05 10.05 0 01-1.112.063c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878l4.242 4.242" /></svg>
                       ) : (
-                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                       )}
                     </button>
                   </div>
                 </div>
-                <div>
-                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">성함</label>
-                  <input required type="text" className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-bold focus:border-indigo-500 focus:bg-white outline-none transition-all" value={formData.name || ''} onChange={e => setFormData({...formData, name: e.target.value})} />
-                </div>
-                <div>
-                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">연락처</label>
-                  <input type="tel" className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-bold focus:border-indigo-500 focus:bg-white outline-none transition-all" value={formData.phone || ''} onChange={handlePhoneChange} />
-                </div>
-              </div>
 
-              <div className="grid grid-cols-2 gap-6 pt-4">
+                <div>
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">성명</label>
+                  <input required type="text" className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-bold focus:border-indigo-500 focus:bg-white outline-none transition-all" value={formData.name || ''} onChange={e => setFormData({ ...formData, name: e.target.value })} />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">소속기관명</label>
+                  <input required type="text" readOnly={formData.classification !== 'Client'} className={`w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-bold focus:border-indigo-500 focus:bg-white outline-none transition-all ${formData.classification !== 'Client' ? 'opacity-70 cursor-not-allowed text-slate-500' : ''}`} value={formData.organizationName || ''} onChange={e => setFormData({ ...formData, organizationName: e.target.value })} placeholder="소속기관 입력" />
+                </div>
+
                 <div>
                   <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">부서 / 조직</label>
-                  <input type="text" className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-bold focus:border-indigo-500 focus:bg-white outline-none transition-all" value={formData.department || ''} onChange={e => setFormData({...formData, department: e.target.value})} />
+                  <input type="text" className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-bold focus:border-indigo-500 focus:bg-white outline-none transition-all" value={formData.department || ''} onChange={e => setFormData({ ...formData, department: e.target.value })} />
                 </div>
+
                 <div>
                   <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">직책 / 역할</label>
-                  <input type="text" className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-bold focus:border-indigo-500 focus:bg-white outline-none transition-all" value={formData.role || ''} onChange={e => setFormData({...formData, role: e.target.value})} />
+                  <input type="text" className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-bold focus:border-indigo-500 focus:bg-white outline-none transition-all" value={formData.role || ''} onChange={e => setFormData({ ...formData, role: e.target.value })} />
                 </div>
-              </div>
 
-              <div>
-                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">이메일</label>
-                <input required type="email" className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-bold focus:border-indigo-500 focus:bg-white outline-none transition-all" value={formData.email || ''} onChange={e => setFormData({...formData, email: e.target.value})} />
-              </div>
+                <div>
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">연락처</label>
+                  <input type="tel" className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-bold focus:border-indigo-500 focus:bg-white outline-none transition-all" value={formData.phone || ''} onChange={handlePhoneChange} placeholder="010-0000-0000" />
+                </div>
 
-              <div>
-                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">활동 상태</label>
-                <select className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-bold focus:border-indigo-500 focus:bg-white outline-none transition-all" value={formData.status || 'Active'} onChange={e => setFormData({...formData, status: e.target.value as MemberStatus})}>
-                  <option value="Active">활성 (Active)</option>
-                  <option value="Inactive">비활성 (Inactive)</option>
-                </select>
+                <div>
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">이메일</label>
+                  <input required type="email" className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-bold focus:border-indigo-500 focus:bg-white outline-none transition-all" value={formData.email || ''} onChange={e => setFormData({ ...formData, email: e.target.value })} />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">활동 상태</label>
+                  <select className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-bold focus:border-indigo-500 focus:bg-white outline-none transition-all" value={formData.status || 'Active'} onChange={e => setFormData({ ...formData, status: e.target.value as MemberStatus })}>
+                    <option value="Active">활성 (Active)</option>
+                    <option value="Inactive">비활성 (Inactive)</option>
+                  </select>
+                </div>
               </div>
 
               <div className="pt-8 flex gap-4">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-3.5 bg-slate-100 text-slate-600 font-black rounded-2xl hover:bg-slate-200 transition-all active:scale-[0.98]">취소</button>
-                <button type="submit" className="flex-1 py-3.5 bg-indigo-600 text-white font-black rounded-2xl hover:bg-indigo-700 shadow-xl shadow-indigo-100 active:scale-[0.98] transition-all">
+                <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-4 bg-slate-100 text-slate-600 font-black rounded-2xl hover:bg-slate-200 transition-all active:scale-[0.98]">취소</button>
+                <button type="submit" className="flex-1 py-4 bg-indigo-600 text-white font-black rounded-2xl hover:bg-indigo-700 shadow-xl shadow-indigo-100 active:scale-[0.98] transition-all">
                   {editingMember ? '정보 업데이트' : '신규 회원 생성'}
                 </button>
               </div>

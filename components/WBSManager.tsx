@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { Task, Resource, Status } from '../types';
+import { Task, Resource, Status, Project } from '../types';
 import { ICONS } from '../constants';
 import {
   DndContext,
@@ -27,12 +27,21 @@ interface WBSManagerProps {
   resources: Resource[];
   currentUser: Resource;
   currentProjectId: string;
+  projects: Project[];
 }
 
-const WBSManager: React.FC<WBSManagerProps> = ({ tasks, setTasks, resources, currentUser, currentProjectId }) => {
+const WBSManager: React.FC<WBSManagerProps> = ({ tasks, setTasks, resources, currentUser, currentProjectId, projects }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [parentIdForNewTask, setParentIdForNewTask] = useState<string | undefined>(undefined);
+
+  const currentProject = useMemo(() => projects.find(p => p.id === currentProjectId), [projects, currentProjectId]);
+
+  const canEdit = useMemo(() => {
+    if (!currentUser || !currentProject) return false;
+    if (currentUser.classification === 'Admin') return true;
+    return currentUser.id === currentProject.managerId || currentUser.id === currentProject.plId;
+  }, [currentUser, currentProject]);
 
   const calculateWorkingDays = (startStr: string, endStr: string): number => {
     if (!startStr || !endStr) return 0;
@@ -98,6 +107,7 @@ const WBSManager: React.FC<WBSManagerProps> = ({ tasks, setTasks, resources, cur
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!canEdit) return;
     let next: Task[];
     if (editingTask) next = tasks.map(t => t.id === editingTask.id ? { ...editingTask, ...formData } as Task : t);
     else next = [...tasks, { ...formData as Task, id: `t${Date.now()}`, projectId: currentProjectId, parentId: parentIdForNewTask }];
@@ -165,9 +175,14 @@ const WBSManager: React.FC<WBSManagerProps> = ({ tasks, setTasks, resources, cur
       const activeItem = items[oldIndex];
       const overItem = items[newIndex];
 
-      let newItem = { ...activeItem };
+      const reordered = arrayMove(items, oldIndex, newIndex) as Task[];
+      const finalIndex = reordered.findIndex(t => t.id === activeItem.id);
 
-      // Prevent moving parent into child
+      // --- Reparenting Logic ---
+
+      let newParentId: string | undefined = undefined;
+
+      // Prevent moving into own descendant
       let isDescendant = false;
       let checkId = overItem.parentId;
       while (checkId) {
@@ -184,33 +199,33 @@ const WBSManager: React.FC<WBSManagerProps> = ({ tasks, setTasks, resources, cur
         return;
       }
 
-      // Determine effective new index in the flattened list (after arrayMove)
-      const reordered = arrayMove(items, oldIndex, newIndex) as Task[];
-      const finalIndex = reordered.findIndex(t => t.id === activeItem.id);
-
-      let newParentId: string | undefined = undefined;
-
       if (finalIndex === 0) {
-        newParentId = undefined;
+        newParentId = undefined; // Must be root if first
       } else {
-        const prevItem = reordered[finalIndex - 1];
+        const prevItem = reordered[finalIndex - 1]; // Item physically above the dropped location
+
         const prevDepth = depthMap.get(prevItem.id) || 0;
         const currentDepth = depthMap.get(activeItem.id) || 0;
         const projectedDepth = Math.max(0, currentDepth + Math.round(delta.x / 24));
 
+        // Logic:
+        // Max depth we can go is prevDepth + 1 (become child of prev)
+        // Min depth is 0
         const maxDepth = prevDepth + 1;
         const targetDepth = Math.min(projectedDepth, maxDepth);
 
         if (targetDepth === maxDepth) {
-          // Indent: Become child of prevItem
+          // Indent: we become a child of prevItem
           newParentId = prevItem.id;
         } else if (targetDepth === 0) {
-          // Outdent to root
+          // Root
           newParentId = undefined;
         } else {
-          // Outdent/Stay: Find ancestor at appropriate level
+          // Middle ground: match depth of an ancestor
+          // We want to be at `targetDepth`. So our parent should be at `targetDepth - 1`.
           const requiredParentDepth = targetDepth - 1;
 
+          // Walk up from prevItem until we find a parent at requiredParentDepth
           let current: Task | undefined = prevItem;
           let found = false;
           while (current) {
@@ -220,19 +235,21 @@ const WBSManager: React.FC<WBSManagerProps> = ({ tasks, setTasks, resources, cur
               found = true;
               break;
             }
+            // Go to parent
             const pid = current.parentId;
-            if (!pid) break;
+            if (!pid) break; // Should have found it by now if hierarchy is consistent
             current = reordered.find(t => t.id === pid);
           }
-          if (!found) newParentId = undefined;
+          if (!found) {
+            // Fallback (should rarely happen if drag is consistent)
+            newParentId = undefined;
+          }
         }
       }
 
-      newItem.parentId = newParentId;
-
-      const newItems = arrayMove(items, oldIndex, newIndex) as Task[];
-      const idx = newItems.findIndex(t => t.id === activeItem.id);
-      newItems[idx] = newItem;
+      const newItem = { ...activeItem, parentId: newParentId };
+      const newItems = [...reordered];
+      newItems[finalIndex] = newItem;
 
       setTasks(recalculateHierarchy(newItems));
     }
@@ -240,9 +257,13 @@ const WBSManager: React.FC<WBSManagerProps> = ({ tasks, setTasks, resources, cur
   };
 
   const sortedTasks = useMemo(() => {
-    const flatten = (items: Task[], parentId?: string): Task[] => {
+    const flatten = (items: Task[], parentId?: string, prefix: string = ''): (Task & { wbsNo: string })[] => {
       const children = items.filter(item => item.parentId === parentId);
-      return children.flatMap(child => [child, ...flatten(items, child.id)]);
+      // Sort logic if needed, currently relying on array order or implementation details
+      return children.flatMap((child, index) => {
+        const wbsNo = prefix ? `${prefix}.${index + 1}` : `${index + 1}`;
+        return [{ ...child, wbsNo }, ...flatten(items, child.id, wbsNo)];
+      });
     };
     return flatten(tasks, undefined);
   }, [tasks]);
@@ -259,7 +280,7 @@ const WBSManager: React.FC<WBSManagerProps> = ({ tasks, setTasks, resources, cur
     return map;
   }, [tasks]);
 
-  const SortableTaskRow: React.FC<{ task: Task; depth: number }> = ({ task, depth }) => {
+  const SortableTaskRow: React.FC<{ task: Task & { wbsNo: string }; depth: number }> = ({ task, depth }) => {
     const {
       attributes,
       listeners,
@@ -267,7 +288,7 @@ const WBSManager: React.FC<WBSManagerProps> = ({ tasks, setTasks, resources, cur
       transform,
       transition,
       isDragging,
-    } = useSortable({ id: task.id });
+    } = useSortable({ id: task.id, disabled: !canEdit });
 
     const style = {
       transform: CSS.Transform.toString(transform),
@@ -282,45 +303,51 @@ const WBSManager: React.FC<WBSManagerProps> = ({ tasks, setTasks, resources, cur
 
     return (
       <tr ref={setNodeRef} style={style} className={`border-b border-slate-50 hover:bg-slate-50/80 transition-all group ${isDragging ? 'bg-indigo-50' : ''}`}>
-        <td className="py-4 pl-6 pr-3">
+        <td className="py-2 pl-4 pr-2">
           <div className="flex items-center" style={{ paddingLeft: `${depth * 24}px` }}>
-            <button className="mr-3 text-slate-300 hover:text-indigo-600 cursor-grab active:cursor-grabbing touch-none" {...attributes} {...listeners}>
-              <ICONS.Move className="w-4 h-4" />
-            </button>
-            <div className={`w-2 h-2 rounded-full mr-4 ${hasChildren ? 'bg-indigo-600 shadow-md shadow-indigo-100' : 'bg-slate-300'}`}></div>
-            <span className={`text-[14px] ${hasChildren ? 'font-black text-slate-800' : 'text-slate-600 font-bold'}`}>{task.title}</span>
+            {canEdit ? (
+              <button className="mr-2 text-slate-300 hover:text-indigo-600 cursor-grab active:cursor-grabbing touch-none" {...attributes} {...listeners}>
+                <ICONS.Move className="w-3.5 h-3.5" />
+              </button>
+            ) : (
+              <div className="mr-2 w-3.5"></div>
+            )}
+            <span className="text-[13px] font-black text-slate-500 mr-2">{task.wbsNo}</span>
+            <span className={`text-[13px] ${hasChildren ? 'font-black text-slate-800' : 'text-slate-600 font-bold'}`}>{task.title}</span>
           </div>
         </td>
-        <td className="px-3 py-4">
-          <div className="flex items-center gap-3">
+        <td className="px-2 py-2">
+          <div className="flex items-center gap-2">
             {assignee ? (
               <>
-                <img src={assignee.avatar} className="w-6 h-6 rounded-lg object-cover border border-slate-100 shadow-sm" />
+                <img src={assignee.avatar} className="w-5 h-5 rounded-md object-cover border border-slate-100 shadow-sm" />
                 <span className="text-[12px] font-black text-slate-700">{assignee.name}</span>
               </>
             ) : <span className="text-[11px] text-slate-300 font-black italic uppercase tracking-tighter">Unassigned</span>}
           </div>
         </td>
-        <td className="px-3 py-4 text-[12px] font-black text-slate-400 tabular-nums">
+        <td className="px-2 py-2 text-[11px] font-black text-slate-400 tabular-nums">
           {task.startDate} ~ {task.endDate}
         </td>
-        <td className="px-3 py-4">
-          <div className="flex items-center gap-4">
-            <div className="flex-1 bg-slate-100 h-2 rounded-full overflow-hidden min-w-[80px]">
+        <td className="px-2 py-2">
+          <div className="flex items-center gap-3">
+            <div className="flex-1 bg-slate-100 h-1.5 rounded-full overflow-hidden min-w-[60px]">
               <div className={`h-full transition-all duration-700 ${task.status === 'Done' ? 'bg-emerald-500' : 'bg-indigo-600'}`} style={{ width: `${task.progress}%` }}></div>
             </div>
             <span className="text-[11px] font-black text-slate-800">{task.progress}%</span>
           </div>
         </td>
-        <td className="px-3 py-4">
-          <span className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider ${task.status === 'Done' ? 'bg-emerald-50 text-emerald-600' :
+        <td className="px-2 py-2">
+          <span className={`px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider ${task.status === 'Done' ? 'bg-emerald-50 text-emerald-600' :
             task.status.includes('Delayed') ? 'bg-red-50 text-red-600' : 'bg-indigo-50 text-indigo-600'
             }`}>{task.status}</span>
         </td>
-        <td className="pr-6 py-4 text-right">
+        <td className="pr-4 py-2 text-right">
           <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-            <button onClick={() => openAddModal(task.id)} className="p-2 hover:bg-indigo-50 text-slate-400 hover:text-indigo-600 rounded-xl transition-all" title="하위 업무 추가"><ICONS.Plus className="w-4 h-4" /></button>
-            <button onClick={() => { setEditingTask(task); setFormData(task); setIsModalOpen(true); }} className="p-2 hover:bg-slate-100 text-slate-400 hover:text-slate-700 rounded-xl transition-all" title="상세 수정"><ICONS.Settings className="w-4 h-4" /></button>
+            {canEdit && (
+              <button onClick={() => openAddModal(task.id)} className="p-1.5 hover:bg-indigo-50 text-slate-400 hover:text-indigo-600 rounded-lg transition-all" title="하위 업무 추가"><ICONS.Plus className="w-3.5 h-3.5" /></button>
+            )}
+            <button onClick={() => { setEditingTask(task); setFormData(task); setIsModalOpen(true); }} className="p-1.5 hover:bg-slate-100 text-slate-400 hover:text-slate-700 rounded-lg transition-all" title="상세 보기"><ICONS.Settings className="w-3.5 h-3.5" /></button>
           </div>
         </td>
       </tr>
@@ -328,16 +355,18 @@ const WBSManager: React.FC<WBSManagerProps> = ({ tasks, setTasks, resources, cur
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-black text-slate-800 tracking-tight">WBS (Work Breakdown Structure)</h2>
           <p className="text-slate-400 text-[11px] font-black mt-1 uppercase tracking-[0.2em]">계층형 공정 관리 시스템</p>
         </div>
-        <button onClick={() => openAddModal()} className="px-6 py-3 bg-indigo-600 text-white font-black rounded-xl text-sm hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100/50 active:scale-[0.98]">새 루트 업무 등록</button>
+        {canEdit && (
+          <button onClick={() => openAddModal()} className="px-4 py-2 bg-indigo-600 text-white font-black rounded-xl text-xs hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100/50 active:scale-[0.98]">새 루트 업무 등록</button>
+        )}
       </div>
 
-      <div className="bg-white rounded-[2rem] border border-slate-200 overflow-hidden shadow-sm">
+      <div className="bg-white rounded-[2rem] border border-slate-200 overflow-hidden shadow-sm h-[50vh] overflow-y-auto custom-scrollbar">
         <DndContext
           sensors={sensors}
           collisionDetection={closestCenter}
@@ -348,12 +377,12 @@ const WBSManager: React.FC<WBSManagerProps> = ({ tasks, setTasks, resources, cur
           <table className="w-full text-left">
             <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
-                <th className="py-5 pl-6 text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">Task Name</th>
-                <th className="px-3 py-5 text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">Assignee</th>
-                <th className="px-3 py-5 text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">Schedule</th>
-                <th className="px-3 py-5 text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">Progress</th>
-                <th className="px-3 py-5 text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">Status</th>
-                <th className="pr-6 py-5 text-right text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">Actions</th>
+                <th className="py-3 pl-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Task Name</th>
+                <th className="px-2 py-3 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Assignee</th>
+                <th className="px-2 py-3 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Schedule</th>
+                <th className="px-2 py-3 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Progress</th>
+                <th className="px-2 py-3 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Status</th>
+                <th className="pr-4 py-3 text-right text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -395,36 +424,40 @@ const WBSManager: React.FC<WBSManagerProps> = ({ tasks, setTasks, resources, cur
               <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-slate-600 p-2">✕</button>
             </div>
             <form onSubmit={handleSubmit} className="p-10 space-y-6">
-              <div>
-                <label className="text-[11px] font-black text-indigo-500 uppercase tracking-[0.2em] block mb-2 ml-1">Task Name (업무명)</label>
-                <input required className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-[16px] font-black text-slate-800 focus:border-indigo-600 focus:bg-white outline-none transition-all" value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} />
-              </div>
-              <div className="grid grid-cols-2 gap-6">
+              <fieldset disabled={!canEdit} className="space-y-6">
                 <div>
-                  <label className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-2 ml-1">Start Date</label>
-                  <input type="date" className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-[14px] font-bold text-slate-700" value={formData.startDate} onChange={e => setFormData({ ...formData, startDate: e.target.value })} />
+                  <label className="text-[11px] font-black text-indigo-500 uppercase tracking-[0.2em] block mb-2 ml-1">Task Name (업무명)</label>
+                  <input required className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-[16px] font-black text-slate-800 focus:border-indigo-600 focus:bg-white outline-none transition-all disabled:bg-slate-100 disabled:text-slate-500" value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} />
                 </div>
-                <div>
-                  <label className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-2 ml-1">End Date</label>
-                  <input type="date" className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-[14px] font-bold text-slate-700" value={formData.endDate} onChange={e => setFormData({ ...formData, endDate: e.target.value })} />
+                <div className="grid grid-cols-2 gap-6">
+                  <div>
+                    <label className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-2 ml-1">Start Date</label>
+                    <input type="date" className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-[14px] font-bold text-slate-700 disabled:bg-slate-100 disabled:text-slate-500" value={formData.startDate} onChange={e => setFormData({ ...formData, startDate: e.target.value })} />
+                  </div>
+                  <div>
+                    <label className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-2 ml-1">End Date</label>
+                    <input type="date" className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-[14px] font-bold text-slate-700 disabled:bg-slate-100 disabled:text-slate-500" value={formData.endDate} onChange={e => setFormData({ ...formData, endDate: e.target.value })} />
+                  </div>
                 </div>
-              </div>
-              <div className="grid grid-cols-2 gap-6">
-                <div>
-                  <label className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-2 ml-1">Assignee</label>
-                  <select className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-[14px] font-bold text-slate-700 outline-none" value={formData.assigneeId} onChange={e => setFormData({ ...formData, assigneeId: e.target.value })}>
-                    <option value="unassigned">미지정</option>
-                    {resources.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
-                  </select>
+                <div className="grid grid-cols-2 gap-6">
+                  <div>
+                    <label className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-2 ml-1">Assignee</label>
+                    <select className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-[14px] font-bold text-slate-700 outline-none disabled:bg-slate-100 disabled:text-slate-500" value={formData.assigneeId} onChange={e => setFormData({ ...formData, assigneeId: e.target.value })}>
+                      <option value="unassigned">미지정</option>
+                      {resources.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-2 ml-1">Progress (%)</label>
+                    <input type="number" min="0" max="100" className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-[16px] font-black text-indigo-600 disabled:bg-slate-100 disabled:text-slate-500" value={formData.progress} onChange={e => setFormData({ ...formData, progress: parseInt(e.target.value) })} />
+                  </div>
                 </div>
-                <div>
-                  <label className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-2 ml-1">Progress (%)</label>
-                  <input type="number" min="0" max="100" className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-[16px] font-black text-indigo-600" value={formData.progress} onChange={e => setFormData({ ...formData, progress: parseInt(e.target.value) })} />
-                </div>
-              </div>
+              </fieldset>
               <div className="pt-4 flex gap-4">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-3.5 bg-slate-100 text-slate-600 font-black rounded-2xl hover:bg-slate-200 transition-all active:scale-[0.98]">취소</button>
-                <button type="submit" className="flex-1 py-3.5 bg-indigo-600 text-white font-black rounded-2xl hover:bg-indigo-700 shadow-xl shadow-indigo-100 active:scale-[0.98] transition-all">정보 저장하기</button>
+                <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-4 bg-slate-100 text-slate-600 font-black rounded-2xl hover:bg-slate-200 transition-all active:scale-[0.98]">취소</button>
+                {canEdit && (
+                  <button type="submit" className="flex-1 py-4 bg-indigo-600 text-white font-black rounded-2xl hover:bg-indigo-700 shadow-xl shadow-indigo-100 active:scale-[0.98] transition-all">정보 저장하기</button>
+                )}
               </div>
             </form>
           </div>

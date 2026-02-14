@@ -2,7 +2,7 @@
 export type Priority = 'High' | 'Medium' | 'Low';
 export type Status = 'To Do' | 'In Progress' | 'Review' | 'Done' | 'Blocked' | 'Start Delayed' | 'End Delayed';
 export type MemberStatus = 'Active' | 'Inactive';
-export type ResourceClassification = 'Admin' | 'Client' | 'Internal';
+export type ResourceClassification = 'Admin' | 'Client' | 'Employee';
 
 export type ProjectStatus = 'Planning' | 'Active' | 'On Hold' | 'Completed';
 
@@ -14,7 +14,7 @@ export interface WorkLog {
 
 export interface Task {
   id: string;
-  projectId: string; 
+  projectId: string;
   title: string;
   assigneeId: string;
   status: Status;
@@ -35,6 +35,7 @@ export interface Resource {
   loginId: string;
   password?: string;
   name: string;
+  organizationName: string; // 소속기관명 추가
   role: string;
   department: string;
   email: string;
@@ -57,6 +58,18 @@ export interface Project {
   managerId: string; // PM
   plId?: string; // PL (선택사항)
   notes?: string; // 참고사항
+}
+
+export interface UserOrganization {
+  id: string;
+  name: string;
+  businessRegistrationNumber: string;
+  representativeName: string;
+  phone: string;
+  zipCode: string;
+  address: string;
+  systemAdminId: string;
+  systemAdminPassword?: string;
 }
 
 export interface ProjectStats {
