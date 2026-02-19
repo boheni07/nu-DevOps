@@ -146,57 +146,59 @@ const MemberManager: React.FC<MemberManagerProps> = ({ resources, setResources, 
   };
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-500 relative">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-black text-slate-800 tracking-tight">회원 관리 (Governance)</h2>
-          <p className="text-slate-500 text-sm">시스템 접근 권한 및 회원 상세 정보를 관리합니다.</p>
-        </div>
-        <button
-          onClick={openAddModal}
-          className="px-5 py-2.5 bg-indigo-600 text-white font-bold rounded-xl text-sm flex items-center gap-2 shadow-lg shadow-indigo-100/50 hover:bg-indigo-700 transition-all active:scale-[0.98]"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
-          신규 회원 추가
-        </button>
-      </div>
-
-      <div className="flex gap-4 items-center mb-4 overflow-x-auto pb-2">
-        <div className="relative flex-1 min-w-[200px] max-w-md">
-          <input
-            type="text"
-            placeholder="이름, ID, 역할로 검색..."
-            className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 outline-none transition-all shadow-sm"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          <div className="absolute left-3.5 top-3 text-slate-400">
-            <ICONS.Search className="w-4 h-4" />
+    <div className="h-[calc(100vh-3.5rem)] flex flex-col bg-white overflow-hidden">
+      <div className="p-6 pb-0 shrink-0">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h2 className="text-2xl font-black text-slate-800 tracking-tight">회원 관리 (Governance)</h2>
+            <p className="text-slate-500 text-sm">시스템 접근 권한 및 회원 상세 정보를 관리합니다.</p>
           </div>
+          <button
+            onClick={openAddModal}
+            className="px-5 py-2.5 bg-indigo-600 text-white font-bold rounded-xl text-sm flex items-center gap-2 shadow-lg shadow-indigo-100/50 hover:bg-indigo-700 transition-all active:scale-[0.98]"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+            신규 회원 추가
+          </button>
         </div>
-        <select
-          className="px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-600 focus:ring-2 focus:ring-indigo-500 outline-none min-w-[140px] shadow-sm"
-          value={classFilter}
-          onChange={(e) => setClassFilter(e.target.value as any)}
-        >
-          <option value="">모든 분류</option>
-          <option value="Admin">관리자 (Admin)</option>
-          <option value="Client">고객 (Client)</option>
-          <option value="Employee">임직원 (Employee)</option>
-        </select>
-        <select
-          className="px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-600 focus:ring-2 focus:ring-indigo-500 outline-none min-w-[140px] shadow-sm"
-          value={deptFilter}
-          onChange={(e) => setDeptFilter(e.target.value)}
-        >
-          <option value="">모든 부서</option>
-          {Array.from(new Set(resources.map(r => r.department))).map(dept => (
-            <option key={dept} value={dept}>{dept}</option>
-          ))}
-        </select>
+
+        <div className="flex gap-4 items-center mb-6 overflow-x-auto pb-2">
+          <div className="relative flex-1 min-w-[200px] max-w-md">
+            <input
+              type="text"
+              placeholder="이름, ID, 역할로 검색..."
+              className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 outline-none transition-all shadow-sm"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <div className="absolute left-3.5 top-3 text-slate-400">
+              <ICONS.Search className="w-4 h-4" />
+            </div>
+          </div>
+          <select
+            className="px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-600 focus:ring-2 focus:ring-indigo-500 outline-none min-w-[140px] shadow-sm"
+            value={classFilter}
+            onChange={(e) => setClassFilter(e.target.value as any)}
+          >
+            <option value="">모든 분류</option>
+            <option value="Admin">관리자 (Admin)</option>
+            <option value="Client">고객 (Client)</option>
+            <option value="Employee">임직원 (Employee)</option>
+          </select>
+          <select
+            className="px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-600 focus:ring-2 focus:ring-indigo-500 outline-none min-w-[140px] shadow-sm"
+            value={deptFilter}
+            onChange={(e) => setDeptFilter(e.target.value)}
+          >
+            <option value="">모든 부서</option>
+            {Array.from(new Set(resources.map(r => r.department))).map(dept => (
+              <option key={dept} value={dept}>{dept}</option>
+            ))}
+          </select>
+        </div>
       </div>
 
-      <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm">
+      <div className="flex-1 overflow-y-auto custom-scrollbar border-t border-slate-100">
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-slate-50/50 border-b border-slate-200">
@@ -269,117 +271,119 @@ const MemberManager: React.FC<MemberManagerProps> = ({ resources, setResources, 
         </table>
       </div>
 
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300" onClick={() => setIsModalOpen(false)}></div>
-          <div className="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-lg relative z-10 overflow-hidden animate-in zoom-in-95 duration-200">
-            <div className="px-10 py-8 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
-              <h3 className="text-2xl font-black text-slate-800 tracking-tight">{editingMember ? '회원 상세 정보' : '신규 회원 등록'}</h3>
-              <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-slate-200 rounded-full transition-colors text-slate-400">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
-              </button>
-            </div>
-
-            <form onSubmit={handleSubmit} className="p-10 space-y-6 max-h-[75vh] overflow-y-auto custom-scrollbar">
-              <div className="flex flex-col items-center gap-4 mb-4">
-                <div className="relative group">
-                  <div className="w-24 h-24 rounded-[2rem] border-4 border-white shadow-xl overflow-hidden bg-slate-100">
-                    <img src={formData.avatar} className="w-full h-full object-cover" alt="Avatar" />
-                  </div>
-                  <button type="button" onClick={() => fileInputRef.current?.click()} className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-[2rem] text-white text-[10px] font-black uppercase tracking-widest">이미지 변경</button>
-                  <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleAvatarChange} />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-6">
-                <div className="col-span-2">
-                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">회원 분류</label>
-                  <div className="grid grid-cols-3 gap-2">
-                    {(['Admin', 'Client', 'Employee'] as ResourceClassification[]).map(cls => (
-                      <button
-                        key={cls}
-                        type="button"
-                        disabled={editingMember?.classification === 'Admin'} // Admin 계정의 분류 수정 방지
-                        onClick={() => handleClassificationChange(cls)}
-                        className={`py-3 rounded-2xl border-2 text-[10px] font-black transition-all ${formData.classification === cls
-                          ? 'border-indigo-600 bg-indigo-50 text-indigo-600 shadow-md'
-                          : 'border-slate-100 bg-slate-50 text-slate-400 hover:border-slate-200'
-                          } ${editingMember?.classification === 'Admin' ? 'opacity-50 cursor-not-allowed' : ''}`}
-                      >
-                        {cls === 'Admin' ? '관리자' : cls === 'Client' ? '고객' : '임직원'}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">로그인 ID</label>
-                  <input required disabled={editingMember?.classification === 'Admin'} type="text" className={`w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-bold focus:border-indigo-500 focus:bg-white outline-none transition-all ${editingMember?.classification === 'Admin' ? 'opacity-50' : ''}`} value={formData.loginId || ''} onChange={e => setFormData({ ...formData, loginId: e.target.value })} />
-                </div>
-
-                <div>
-                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">비밀번호</label>
-                  <div className="relative">
-                    <input type={showPassword ? "text" : "password"} className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-bold focus:border-indigo-500 focus:bg-white outline-none transition-all pr-12" value={formData.password || ''} onChange={e => setFormData({ ...formData, password: e.target.value })} />
-                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-4.5 text-slate-400 hover:text-indigo-600">
-                      {showPassword ? (
-                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.888 9.888L3 3m18 18l-6.888-6.888m0 0a10.05 10.05 0 01-1.112.063c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878l4.242 4.242" /></svg>
-                      ) : (
-                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-                      )}
-                    </button>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">성명</label>
-                  <input required type="text" className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-bold focus:border-indigo-500 focus:bg-white outline-none transition-all" value={formData.name || ''} onChange={e => setFormData({ ...formData, name: e.target.value })} />
-                </div>
-
-                <div>
-                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">소속기관명</label>
-                  <input required type="text" readOnly={formData.classification !== 'Client'} className={`w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-bold focus:border-indigo-500 focus:bg-white outline-none transition-all ${formData.classification !== 'Client' ? 'opacity-70 cursor-not-allowed text-slate-500' : ''}`} value={formData.organizationName || ''} onChange={e => setFormData({ ...formData, organizationName: e.target.value })} placeholder="소속기관 입력" />
-                </div>
-
-                <div>
-                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">부서 / 조직</label>
-                  <input type="text" className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-bold focus:border-indigo-500 focus:bg-white outline-none transition-all" value={formData.department || ''} onChange={e => setFormData({ ...formData, department: e.target.value })} />
-                </div>
-
-                <div>
-                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">직책 / 역할</label>
-                  <input type="text" className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-bold focus:border-indigo-500 focus:bg-white outline-none transition-all" value={formData.role || ''} onChange={e => setFormData({ ...formData, role: e.target.value })} />
-                </div>
-
-                <div>
-                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">연락처</label>
-                  <input type="tel" className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-bold focus:border-indigo-500 focus:bg-white outline-none transition-all" value={formData.phone || ''} onChange={handlePhoneChange} placeholder="010-0000-0000" />
-                </div>
-
-                <div>
-                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">이메일</label>
-                  <input required type="email" className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-bold focus:border-indigo-500 focus:bg-white outline-none transition-all" value={formData.email || ''} onChange={e => setFormData({ ...formData, email: e.target.value })} />
-                </div>
-
-                <div>
-                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">활동 상태</label>
-                  <select className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-bold focus:border-indigo-500 focus:bg-white outline-none transition-all" value={formData.status || 'Active'} onChange={e => setFormData({ ...formData, status: e.target.value as MemberStatus })}>
-                    <option value="Active">활성 (Active)</option>
-                    <option value="Inactive">비활성 (Inactive)</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="pt-8 flex gap-4">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-4 bg-slate-100 text-slate-600 font-black rounded-2xl hover:bg-slate-200 transition-all active:scale-[0.98]">취소</button>
-                <button type="submit" className="flex-1 py-4 bg-indigo-600 text-white font-black rounded-2xl hover:bg-indigo-700 shadow-xl shadow-indigo-100 active:scale-[0.98] transition-all">
-                  {editingMember ? '정보 업데이트' : '신규 회원 생성'}
+      {
+        isModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300" onClick={() => setIsModalOpen(false)}></div>
+            <div className="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-lg relative z-10 overflow-hidden animate-in zoom-in-95 duration-200">
+              <div className="px-10 py-8 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                <h3 className="text-2xl font-black text-slate-800 tracking-tight">{editingMember ? '회원 상세 정보' : '신규 회원 등록'}</h3>
+                <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-slate-200 rounded-full transition-colors text-slate-400">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
                 </button>
               </div>
-            </form>
+
+              <form onSubmit={handleSubmit} className="p-10 space-y-6 max-h-[75vh] overflow-y-auto custom-scrollbar">
+                <div className="flex flex-col items-center gap-4 mb-4">
+                  <div className="relative group">
+                    <div className="w-24 h-24 rounded-[2rem] border-4 border-white shadow-xl overflow-hidden bg-slate-100">
+                      <img src={formData.avatar} className="w-full h-full object-cover" alt="Avatar" />
+                    </div>
+                    <button type="button" onClick={() => fileInputRef.current?.click()} className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-[2rem] text-white text-[10px] font-black uppercase tracking-widest">이미지 변경</button>
+                    <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleAvatarChange} />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="col-span-2">
+                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">회원 분류</label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {(['Admin', 'Client', 'Employee'] as ResourceClassification[]).map(cls => (
+                        <button
+                          key={cls}
+                          type="button"
+                          disabled={editingMember?.classification === 'Admin'} // Admin 계정의 분류 수정 방지
+                          onClick={() => handleClassificationChange(cls)}
+                          className={`py-3 rounded-2xl border-2 text-[10px] font-black transition-all ${formData.classification === cls
+                            ? 'border-indigo-600 bg-indigo-50 text-indigo-600 shadow-md'
+                            : 'border-slate-100 bg-slate-50 text-slate-400 hover:border-slate-200'
+                            } ${editingMember?.classification === 'Admin' ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        >
+                          {cls === 'Admin' ? '관리자' : cls === 'Client' ? '고객' : '임직원'}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">로그인 ID</label>
+                    <input required disabled={editingMember?.classification === 'Admin'} type="text" className={`w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-bold focus:border-indigo-500 focus:bg-white outline-none transition-all ${editingMember?.classification === 'Admin' ? 'opacity-50' : ''}`} value={formData.loginId || ''} onChange={e => setFormData({ ...formData, loginId: e.target.value })} />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">비밀번호</label>
+                    <div className="relative">
+                      <input type={showPassword ? "text" : "password"} className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-bold focus:border-indigo-500 focus:bg-white outline-none transition-all pr-12" value={formData.password || ''} onChange={e => setFormData({ ...formData, password: e.target.value })} />
+                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-4.5 text-slate-400 hover:text-indigo-600">
+                        {showPassword ? (
+                          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.888 9.888L3 3m18 18l-6.888-6.888m0 0a10.05 10.05 0 01-1.112.063c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878l4.242 4.242" /></svg>
+                        ) : (
+                          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">성명</label>
+                    <input required type="text" className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-bold focus:border-indigo-500 focus:bg-white outline-none transition-all" value={formData.name || ''} onChange={e => setFormData({ ...formData, name: e.target.value })} />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">소속기관명</label>
+                    <input required type="text" readOnly={formData.classification !== 'Client'} className={`w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-bold focus:border-indigo-500 focus:bg-white outline-none transition-all ${formData.classification !== 'Client' ? 'opacity-70 cursor-not-allowed text-slate-500' : ''}`} value={formData.organizationName || ''} onChange={e => setFormData({ ...formData, organizationName: e.target.value })} placeholder="소속기관 입력" />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">부서 / 조직</label>
+                    <input type="text" className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-bold focus:border-indigo-500 focus:bg-white outline-none transition-all" value={formData.department || ''} onChange={e => setFormData({ ...formData, department: e.target.value })} />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">직책 / 역할</label>
+                    <input type="text" className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-bold focus:border-indigo-500 focus:bg-white outline-none transition-all" value={formData.role || ''} onChange={e => setFormData({ ...formData, role: e.target.value })} />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">연락처</label>
+                    <input type="tel" className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-bold focus:border-indigo-500 focus:bg-white outline-none transition-all" value={formData.phone || ''} onChange={handlePhoneChange} placeholder="010-0000-0000" />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">이메일</label>
+                    <input required type="email" className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-bold focus:border-indigo-500 focus:bg-white outline-none transition-all" value={formData.email || ''} onChange={e => setFormData({ ...formData, email: e.target.value })} />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">활동 상태</label>
+                    <select className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-bold focus:border-indigo-500 focus:bg-white outline-none transition-all" value={formData.status || 'Active'} onChange={e => setFormData({ ...formData, status: e.target.value as MemberStatus })}>
+                      <option value="Active">활성 (Active)</option>
+                      <option value="Inactive">비활성 (Inactive)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="pt-8 flex gap-4">
+                  <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-4 bg-slate-100 text-slate-600 font-black rounded-2xl hover:bg-slate-200 transition-all active:scale-[0.98]">취소</button>
+                  <button type="submit" className="flex-1 py-4 bg-indigo-600 text-white font-black rounded-2xl hover:bg-indigo-700 shadow-xl shadow-indigo-100 active:scale-[0.98] transition-all">
+                    {editingMember ? '정보 업데이트' : '신규 회원 생성'}
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
-        </div>
-      )}
+        )
+      }
 
       <style>{`
         .custom-scrollbar::-webkit-scrollbar {
@@ -396,7 +400,7 @@ const MemberManager: React.FC<MemberManagerProps> = ({ resources, setResources, 
           background: #cbd5e1;
         }
       `}</style>
-    </div>
+    </div >
   );
 };
 

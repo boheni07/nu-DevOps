@@ -34,6 +34,8 @@ const WBSManager: React.FC<WBSManagerProps> = ({ tasks, setTasks, resources, cur
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [parentIdForNewTask, setParentIdForNewTask] = useState<string | undefined>(undefined);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
 
   const currentProject = useMemo(() => projects.find(p => p.id === currentProjectId), [projects, currentProjectId]);
 
@@ -103,6 +105,32 @@ const WBSManager: React.FC<WBSManagerProps> = ({ tasks, setTasks, resources, cur
       });
     }
     return updated;
+  };
+
+  const handleDeleteTask = (task: Task) => {
+    if (!canEdit) return;
+    setTaskToDelete(task);
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (!taskToDelete) return;
+    const id = taskToDelete.id;
+
+    const findSubtreeIds = (parentId: string): string[] => {
+      const children = tasks.filter(t => t.parentId === parentId);
+      let ids = children.map(c => c.id);
+      children.forEach(c => {
+        ids = [...ids, ...findSubtreeIds(c.id)];
+      });
+      return ids;
+    };
+
+    const toDeleteIds = [id, ...findSubtreeIds(id)];
+    const nextTasks = tasks.filter(t => !toDeleteIds.includes(t.id));
+    setTasks(recalculateHierarchy(nextTasks));
+    setIsDeleteModalOpen(false);
+    setTaskToDelete(null);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -345,7 +373,10 @@ const WBSManager: React.FC<WBSManagerProps> = ({ tasks, setTasks, resources, cur
         <td className="pr-4 py-2 text-right">
           <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
             {canEdit && (
-              <button onClick={() => openAddModal(task.id)} className="p-1.5 hover:bg-indigo-50 text-slate-400 hover:text-indigo-600 rounded-lg transition-all" title="하위 업무 추가"><ICONS.Plus className="w-3.5 h-3.5" /></button>
+              <>
+                <button onClick={() => openAddModal(task.id)} className="p-1.5 hover:bg-indigo-50 text-slate-400 hover:text-indigo-600 rounded-lg transition-all" title="하위 업무 추가"><ICONS.Plus className="w-3.5 h-3.5" /></button>
+                <button onClick={() => handleDeleteTask(task)} className="p-1.5 hover:bg-red-50 text-slate-400 hover:text-red-600 rounded-lg transition-all" title="삭제"><ICONS.Trash className="w-3.5 h-3.5" /></button>
+              </>
             )}
             <button onClick={() => { setEditingTask(task); setFormData(task); setIsModalOpen(true); }} className="p-1.5 hover:bg-slate-100 text-slate-400 hover:text-slate-700 rounded-lg transition-all" title="상세 보기"><ICONS.Settings className="w-3.5 h-3.5" /></button>
           </div>
@@ -355,18 +386,18 @@ const WBSManager: React.FC<WBSManagerProps> = ({ tasks, setTasks, resources, cur
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
+    <div className="h-[calc(100vh-3.5rem)] flex flex-col bg-white overflow-hidden">
+      <div className="flex items-center justify-between p-6 bg-slate-50/30 border-b border-slate-100 shrink-0">
         <div>
           <h2 className="text-2xl font-black text-slate-800 tracking-tight">WBS (Work Breakdown Structure)</h2>
           <p className="text-slate-400 text-[11px] font-black mt-1 uppercase tracking-[0.2em]">계층형 공정 관리 시스템</p>
         </div>
         {canEdit && (
-          <button onClick={() => openAddModal()} className="px-4 py-2 bg-indigo-600 text-white font-black rounded-xl text-xs hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100/50 active:scale-[0.98]">새 루트 업무 등록</button>
+          <button onClick={() => openAddModal()} className="px-5 py-2.5 bg-indigo-600 text-white font-black rounded-2xl text-xs hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100/50 active:scale-[0.98]">새 루트 업무 등록</button>
         )}
       </div>
 
-      <div className="bg-white rounded-[2rem] border border-slate-200 overflow-hidden shadow-sm h-[50vh] overflow-y-auto custom-scrollbar">
+      <div className="flex-1 overflow-y-auto custom-scrollbar bg-white">
         <DndContext
           sensors={sensors}
           collisionDetection={closestCenter}
@@ -375,7 +406,7 @@ const WBSManager: React.FC<WBSManagerProps> = ({ tasks, setTasks, resources, cur
           onDragMove={handleDragMove}
         >
           <table className="w-full text-left">
-            <thead className="bg-slate-50 border-b border-slate-200">
+            <thead className="sticky top-0 z-10 bg-slate-50 border-b border-slate-200">
               <tr>
                 <th className="py-3 pl-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Task Name</th>
                 <th className="px-2 py-3 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Assignee</th>
@@ -460,6 +491,30 @@ const WBSManager: React.FC<WBSManagerProps> = ({ tasks, setTasks, resources, cur
                 )}
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {isDeleteModalOpen && taskToDelete && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md animate-in fade-in" onClick={() => setIsDeleteModalOpen(false)}></div>
+          <div className="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-md relative z-10 animate-in zoom-in-95 duration-200 overflow-hidden text-center">
+            <div className="p-10">
+              <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                <ICONS.Alert className="w-10 h-10 text-red-500" />
+              </div>
+              <h3 className="text-2xl font-black text-slate-800 mb-2 tracking-tight">정말 삭제하시겠습니까?</h3>
+              <p className="text-slate-500 text-[14px] font-bold leading-relaxed mb-8">
+                <span className="text-slate-800">"{taskToDelete.title}"</span> 업무를 삭제하시겠습니까?<br />
+                {tasks.some(t => t.parentId === taskToDelete.id) && (
+                  <span className="text-red-500 block mt-2 font-black">※ 하위 업무가 있는 경우 모두 함께 삭제됩니다.</span>
+                )}
+              </p>
+              <div className="flex gap-3 mt-8">
+                <button onClick={() => setIsDeleteModalOpen(false)} className="flex-1 py-4.5 bg-slate-100 text-slate-600 font-black rounded-2xl hover:bg-slate-200 transition-all active:scale-[0.98]">취소</button>
+                <button onClick={confirmDelete} className="flex-1 py-4.5 bg-red-500 text-white font-black rounded-2xl hover:bg-red-600 shadow-xl shadow-red-100 active:scale-[0.98] transition-all">삭제하기</button>
+              </div>
+            </div>
           </div>
         </div>
       )}

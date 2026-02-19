@@ -1,5 +1,5 @@
 
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect, useRef } from 'react';
 import { Task, Project } from '../types';
 
 interface GanttChartProps {
@@ -10,6 +10,16 @@ interface GanttChartProps {
 const GanttChart: React.FC<GanttChartProps> = ({ tasks, project }) => {
   const [zoom, setZoom] = useState<'day' | 'week'>('day');
   const [cellWidth, setCellWidth] = useState(28);
+
+  const headerRef = useRef<HTMLDivElement>(null);
+  const chartRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
+
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const { scrollLeft, scrollTop } = e.currentTarget;
+    if (headerRef.current) headerRef.current.scrollLeft = scrollLeft;
+    if (listRef.current) listRef.current.scrollTop = scrollTop;
+  };
 
   useEffect(() => {
     setCellWidth(zoom === 'day' ? 28 : 70);
@@ -132,11 +142,11 @@ const GanttChart: React.FC<GanttChartProps> = ({ tasks, project }) => {
   const ROW_HEIGHT = 40; // 콤팩트 디자인을 위해 64에서 40으로 축소
 
   return (
-    <div className="space-y-4 animate-in fade-in duration-500">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 px-2">
+    <div className="h-full flex flex-col bg-white overflow-hidden">
+      <div className="flex items-center justify-between p-6 bg-slate-50/30 border-b border-slate-100 shrink-0">
         <div>
-          <h2 className="text-2xl font-black text-slate-800 tracking-tight">계획 대비 실적 간트 차트</h2>
-          <p className="text-slate-400 text-[11px] font-black mt-1 uppercase tracking-[0.2em]">PLAN vs ACTUAL VISUALIZATION</p>
+          <h2 className="text-2xl font-black text-slate-800 tracking-tight">Gantt Chart</h2>
+          <p className="text-slate-400 text-[11px] font-black mt-1 uppercase tracking-[0.2em]">{project.name} 일정 현황</p>
         </div>
 
         <div className="flex items-center gap-4 bg-white p-1.5 rounded-2xl border border-slate-200 shadow-sm">
@@ -165,12 +175,12 @@ const GanttChart: React.FC<GanttChartProps> = ({ tasks, project }) => {
         </div>
       </div>
 
-      <div className="bg-white rounded-[1.5rem] border border-slate-200 shadow-sm flex flex-col h-[calc(100vh-210px)] overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-hidden bg-white border-b border-slate-200">
         <div className="flex border-b border-slate-200 bg-slate-50 sticky top-0 z-20">
           <div className="w-64 flex-shrink-0 p-2 border-r border-slate-200 font-black text-slate-400 text-[10px] uppercase tracking-[0.2em] flex items-center bg-slate-50 h-10">
             Task Name
           </div>
-          <div className="flex-1 overflow-x-auto overflow-y-hidden custom-scrollbar bg-white">
+          <div className="flex-1 overflow-x-hidden overflow-y-hidden bg-white" ref={headerRef}>
             <div className="flex" style={{ width: `${periods.length * cellWidth}px` }}>
               {periods.map((period, idx) => {
                 const isMonthStart = period.date.getDate() <= 7 && zoom === 'week' || (period.date.getDate() === 1 && zoom === 'day') || idx === 0;
@@ -196,7 +206,7 @@ const GanttChart: React.FC<GanttChartProps> = ({ tasks, project }) => {
         </div>
 
         <div className="flex flex-1 overflow-hidden">
-          <div className="w-64 flex-shrink-0 border-r border-slate-200 overflow-y-auto overflow-x-hidden bg-white custom-scrollbar z-10">
+          <div className="w-64 flex-shrink-0 border-r border-slate-200 overflow-y-hidden overflow-x-hidden bg-white z-10" ref={listRef}>
             {flattenedTasks.map(({ task, depth, wbsNo }) => (
               <div
                 key={task.id}
@@ -211,7 +221,7 @@ const GanttChart: React.FC<GanttChartProps> = ({ tasks, project }) => {
             ))}
           </div>
 
-          <div className="flex-1 overflow-auto custom-scrollbar bg-slate-50/10">
+          <div className="flex-1 overflow-auto custom-scrollbar bg-slate-50/10" ref={chartRef} onScroll={handleScroll}>
             <div className="relative" style={{ width: `${periods.length * cellWidth}px`, height: `${flattenedTasks.length * ROW_HEIGHT}px` }}>
               {periods.map((_, idx) => (
                 <div
@@ -279,8 +289,8 @@ const GanttChart: React.FC<GanttChartProps> = ({ tasks, project }) => {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl border border-slate-200 p-3 flex flex-wrap items-center gap-x-8 gap-y-2 shadow-sm">
-        <div className="flex items-center gap-6 border-r border-slate-100 pr-10">
+      <div className="bg-slate-50/50 p-4 flex flex-wrap items-center gap-x-8 gap-y-2 shrink-0 border-t border-slate-100">
+        <div className="flex items-center gap-6 border-r border-slate-200 pr-10">
           <div className="flex items-center gap-2">
             <div className="w-6 h-3 bg-slate-100 border border-slate-300 rounded-sm"></div>
             <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Planned (계획)</span>

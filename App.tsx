@@ -246,7 +246,7 @@ const AppContent: React.FC<{
         </div>
       </aside>
 
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="h-full flex flex-col bg-white overflow-hidden">
         <header className="h-14 bg-white border-b border-slate-200 flex items-center justify-between px-6 flex-shrink-0 z-30">
           <div className="flex items-center gap-4">
             <div className="relative group w-64">
@@ -276,7 +276,7 @@ const AppContent: React.FC<{
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto p-6 bg-slate-50/50">
+        <main className={`flex-1 bg-slate-50/50 ${['/wbs', '/gantt', '/members'].includes(location.pathname) ? 'p-0 overflow-hidden' : 'p-6 overflow-y-auto'}`}>
           <Routes>
             <Route path="/" element={currentProject ? <Dashboard tasks={filteredTasks} resources={resources} currentProject={currentProject} /> : <div className="flex flex-col items-center justify-center h-full text-slate-400 animate-in fade-in"><div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4 text-3xl">🚫</div><div className="text-xl font-black mb-2 text-slate-500">접근 가능한 프로젝트가 없습니다</div><p className="text-sm">관리자에게 프로젝트 할당을 요청하거나<br />새로운 프로젝트를 생성하세요.</p></div>} />
             <Route path="/wbs" element={currentProject ? <WBSManager tasks={filteredTasks} setTasks={(newTasks) => setTasks(prev => [...prev.filter(t => t.projectId !== currentProjectId), ...newTasks])} resources={resources} currentUser={currentUser} currentProjectId={currentProjectId} projects={projects} /> : <Navigate to="/" />} />
@@ -285,7 +285,7 @@ const AppContent: React.FC<{
             <Route path="/reports" element={<ProgressReporting tasks={tasks} resources={resources} projects={projects} />} />
             <Route path="/members" element={isStaff ? <MemberManager resources={resources} setResources={setResources} currentUser={currentUser} organizations={organizations} /> : <Navigate to="/" />} />
             <Route path="/resources" element={isStaff ? <ResourceOptimizer tasks={filteredTasks} resources={resources} /> : <Navigate to="/" />} />
-            <Route path="/project" element={isStaff ? <ProjectManager projects={projects} setProjects={setProjects} currentProjectId={currentProjectId} setCurrentProjectId={setCurrentProjectId} resources={resources} currentUser={currentUser} /> : <Navigate to="/" />} />
+            <Route path="/project" element={isStaff ? <ProjectManager projects={projects} setProjects={setProjects} tasks={tasks} setTasks={setTasks} currentProjectId={currentProjectId} setCurrentProjectId={setCurrentProjectId} resources={resources} currentUser={currentUser} /> : <Navigate to="/" />} />
             <Route path="/organizations" element={currentUser.classification === 'Admin' ? <OrganizationManager organizations={organizations} setOrganizations={setOrganizations} currentUser={currentUser} /> : <Navigate to="/" />} />
             <Route path="/data-management" element={currentUser.classification === 'Admin' ? <DataManagement projects={projects} tasks={tasks} resources={resources} organizations={organizations} setProjects={setProjects} setTasks={setTasks} setResources={setResources} /> : <Navigate to="/" />} />
           </Routes>
