@@ -2,11 +2,20 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { Task, Resource } from "../types";
 
-// Always use const ai = new GoogleGenAI({apiKey: process.env.API_KEY});
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+
+const getAI = () => {
+  const apiKey = (process.env.GEMINI_API_KEY || process.env.API_KEY) as string;
+  if (!apiKey || apiKey === 'undefined' || apiKey === 'null' || apiKey.trim() === '') {
+    return null;
+  }
+  return new GoogleGenAI({ apiKey });
+};
 
 export const geminiService = {
   async generateProgressReport(tasks: Task[], resources: Resource[]) {
+    const ai = getAI();
+    if (!ai) return "AI 서비스를 위한 API 키가 설정되지 않았습니다.";
+
     const prompt = `
       다음 소프트웨어 개발 프로젝트의 일감과 자원 데이터를 분석해주세요.
       일감 데이터: ${JSON.stringify(tasks)}
@@ -22,12 +31,10 @@ export const geminiService = {
     `;
 
     try {
-      // Use gemini-3-flash-preview for summarization and report generation tasks
-      const response = await ai.models.generateContent({
-        model: 'gemini-3-flash-preview',
-        contents: prompt,
-      });
-      return response.text;
+      const model = ai.getGenerativeModel({ model: "gemini-2.0-flash" });
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      return response.text();
     } catch (error) {
       console.error("Gemini report error:", error);
       return "현재 보고서를 생성할 수 없습니다.";
@@ -35,6 +42,9 @@ export const geminiService = {
   },
 
   async optimizeResources(tasks: Task[], resources: Resource[]) {
+    const ai = getAI();
+    if (!ai) return "AI 서비스를 위한 API 키가 설정되지 않았습니다.";
+
     const prompt = `
       기술 프로젝트 매니저로서 다음 일감과 자원을 분석하여 최적의 할당 방안을 제시해주세요.
       현재 진행 중인 일감: ${JSON.stringify(tasks.filter(t => t.status !== 'Done'))}
@@ -46,12 +56,10 @@ export const geminiService = {
     `;
 
     try {
-      // Use gemini-3-pro-preview for complex reasoning and optimization tasks
-      const response = await ai.models.generateContent({
-        model: 'gemini-3-pro-preview',
-        contents: prompt,
-      });
-      return response.text;
+      const model = ai.getGenerativeModel({ model: "gemini-2.0-flash" });
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      return response.text();
     } catch (error) {
       console.error("Gemini optimization error:", error);
       return "최적화 제안을 불러올 수 없습니다.";
