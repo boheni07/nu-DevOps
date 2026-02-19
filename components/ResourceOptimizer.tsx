@@ -27,16 +27,16 @@ const ResourceOptimizer: React.FC<ResourceOptimizerProps> = ({ tasks, resources 
   };
 
   return (
-    <div className="space-y-8 animate-in slide-in-from-bottom-4 duration-500">
+    <div className="w-full max-w-[1600px] mx-auto space-y-8 animate-in slide-in-from-bottom-4 duration-500">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-slate-800">자원 최적화</h2>
-          <p className="text-slate-500 text-sm">AI 기반의 업무 부하 분석으로 팀 효율성을 극대화합니다.</p>
+          <p className="text-slate-500 text-[12px] font-medium mt-1">AI 기반의 업무 부하 분석으로 팀 효율성을 극대화합니다.</p>
         </div>
-        <button 
+        <button
           onClick={handleOptimize}
           disabled={optimizing}
-          className="px-6 py-3 bg-indigo-600 text-white font-bold rounded-2xl flex items-center gap-3 hover:bg-indigo-700 shadow-xl shadow-indigo-200 transition-all disabled:opacity-50"
+          className="px-6 py-3 bg-indigo-600 text-white font-bold rounded-xl flex items-center gap-3 hover:bg-indigo-700 shadow-xl shadow-indigo-200 transition-all disabled:opacity-50"
         >
           {optimizing ? (
             <>
@@ -67,14 +67,14 @@ const ResourceOptimizer: React.FC<ResourceOptimizerProps> = ({ tasks, resources 
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <div className="flex justify-between text-xs">
-                    <span className="text-slate-500">주간 부하량</span>
-                    <span className={`font-bold ${isOverloaded ? 'text-red-500' : 'text-slate-800'}`}>{load} / {res.capacity}시간</span>
+                  <div className="flex justify-between text-[12px] mb-1">
+                    <span className="text-slate-500 font-bold uppercase">주간 부하량</span>
+                    <span className={`font-black ${isOverloaded ? 'text-red-500' : 'text-slate-800'}`}>{load} / {res.capacity}시간</span>
                   </div>
                   <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                    <div 
-                      className={`h-full transition-all duration-1000 ${isOverloaded ? 'bg-red-500' : 'bg-indigo-600'}`} 
-                      style={{ width: `${Math.min((load/res.capacity)*100, 100)}%` }}
+                    <div
+                      className={`h-full transition-all duration-1000 ${isOverloaded ? 'bg-red-500' : 'bg-indigo-600'}`}
+                      style={{ width: `${Math.min((load / res.capacity) * 100, 100)}%` }}
                     ></div>
                   </div>
                 </div>

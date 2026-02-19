@@ -62,16 +62,16 @@ const OrganizationManager: React.FC<OrganizationManagerProps> = ({ organizations
     }
 
     return (
-        <div className="space-y-6 animate-in fade-in duration-500 relative h-full flex flex-col">
+        <div className="w-full max-w-[1920px] mx-auto space-y-8 animate-in fade-in zoom-in-95 duration-500 relative h-full flex flex-col">
             <div className="flex items-center justify-between flex-shrink-0">
                 <div>
                     <h2 className="text-2xl font-black text-slate-800 tracking-tight">이용기관 설정 (Organization Settings)</h2>
-                    <p className="text-slate-500 text-sm">시스템의 주체인 이용기관 정보를 설정합니다. (단일 기관)</p>
+                    <p className="text-slate-500 text-[12px] font-medium mt-1">시스템의 주체인 이용기관 정보를 설정합니다. (단일 기관)</p>
                 </div>
             </div>
 
             <div className="flex-1 overflow-y-auto custom-scrollbar pt-4">
-                <div className="max-w-4xl mx-auto bg-white rounded-[2.5rem] shadow-xl border border-slate-100 overflow-hidden">
+                <div className="max-w-5xl mx-auto bg-white rounded-[2.5rem] shadow-xl border border-slate-100 overflow-hidden">
                     <div className="h-40 bg-slate-900 relative overflow-hidden">
                         {/* Background Pattern */}
                         <div className="absolute inset-0 opacity-20">
@@ -91,7 +91,7 @@ const OrganizationManager: React.FC<OrganizationManagerProps> = ({ organizations
                             <div className="ml-6 mb-14 text-white">
                                 <h3 className="text-3xl font-black tracking-tight">{currentOrg.name}</h3>
                                 <p className="text-slate-300 font-medium text-sm flex items-center gap-2">
-                                    <span className="px-2 py-0.5 bg-white/10 rounded text-[10px] font-black uppercase tracking-wider backdrop-blur-sm">System Owner</span>
+                                    <span className="px-2 py-0.5 bg-white/10 rounded-md text-[11px] font-black uppercase tracking-wider backdrop-blur-sm">System Owner</span>
                                     {currentOrg.businessRegistrationNumber}
                                 </p>
                             </div>
@@ -111,7 +111,7 @@ const OrganizationManager: React.FC<OrganizationManagerProps> = ({ organizations
                     <div className="pt-20 pb-12 px-12">
                         <div className="grid grid-cols-2 gap-x-12 gap-y-10">
                             <div>
-                                <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                                <h4 className="text-[12px] font-black text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" /></svg>
                                     대표자 정보
                                 </h4>
@@ -121,7 +121,7 @@ const OrganizationManager: React.FC<OrganizationManagerProps> = ({ organizations
                                 </div>
                             </div>
                             <div>
-                                <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                                <h4 className="text-[12px] font-black text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" /></svg>
                                     소재지 정보
                                 </h4>
@@ -134,14 +134,14 @@ const OrganizationManager: React.FC<OrganizationManagerProps> = ({ organizations
                             </div>
 
                             <div className="col-span-2 pt-8 border-t border-slate-100">
-                                <h4 className="text-xs font-black text-indigo-600 uppercase tracking-widest mb-6 border-b border-indigo-100 pb-2 inline-block">System Admin Account</h4>
+                                <h4 className="text-[12px] font-black text-indigo-600 uppercase tracking-widest mb-6 border-b border-indigo-100 pb-2 inline-block">System Admin Account</h4>
                                 <div className="grid grid-cols-2 gap-6">
                                     <div className="p-5 bg-slate-50 rounded-2xl border border-slate-100 flex justify-between items-center group hover:border-indigo-200 transition-colors">
-                                        <span className="text-xs font-black text-slate-400 uppercase tracking-wider">Admin ID</span>
+                                        <span className="text-[12px] font-black text-slate-400 uppercase tracking-wider">Admin ID</span>
                                         <span className="text-base font-black text-slate-700 font-mono group-hover:text-indigo-600 transition-colors">{currentOrg.systemAdminId}</span>
                                     </div>
                                     <div className="p-5 bg-slate-50 rounded-2xl border border-slate-100 flex justify-between items-center group hover:border-indigo-200 transition-colors">
-                                        <span className="text-xs font-black text-slate-400 uppercase tracking-wider">Password</span>
+                                        <span className="text-[12px] font-black text-slate-400 uppercase tracking-wider">Password</span>
                                         <span className="text-base font-black text-slate-400 font-mono tracking-widest group-hover:text-indigo-600 transition-colors">••••••••</span>
                                     </div>
                                 </div>

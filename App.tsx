@@ -79,12 +79,12 @@ const SidebarItem: React.FC<{ to: string; icon: React.ReactNode; label: string }
   return (
     <Link
       to={to}
-      className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-all text-[13px] font-semibold ${isActive
+      className={`flex items-center gap-2.5 px-3 py-2 rounded-xl transition-all text-sm font-semibold ${isActive
         ? 'bg-indigo-600 text-white shadow-md shadow-indigo-100'
         : 'text-slate-500 hover:bg-slate-100 hover:text-indigo-600'
         }`}
     >
-      <span className={`w-4 h-4 flex-shrink-0`}>
+      <span className="w-4 h-4 flex-shrink-0">
         {icon}
       </span>
       <span className="truncate">{label}</span>
@@ -147,8 +147,8 @@ const AppContent: React.FC<{
 
   return (
     <div className="flex h-screen bg-slate-50">
-      <aside className="w-64 bg-white border-r border-slate-200 flex flex-col flex-shrink-0 z-40 shadow-sm transition-all duration-300">
-        <Link to="/" className="h-40 flex flex-col items-center justify-center px-6 border-b border-slate-100 relative overflow-hidden group bg-slate-50/30 cursor-pointer no-underline block">
+      <aside className="w-52 bg-white border-r border-slate-200 flex flex-col flex-shrink-0 z-40 shadow-sm transition-all duration-300">
+        <Link to="/" className="h-32 flex flex-col items-center justify-center px-4 border-b border-slate-100 relative overflow-hidden group bg-slate-50/30 cursor-pointer no-underline block">
           {/* Decorative Background Elements */}
           <div className="absolute top-0 inset-x-0 h-0.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
           <div className="absolute -top-12 -right-12 w-32 h-32 bg-indigo-500/5 rounded-full blur-3xl group-hover:bg-indigo-500/10 transition-all duration-700"></div>
@@ -180,7 +180,7 @@ const AppContent: React.FC<{
 
         <nav className="flex-1 px-3 py-4 space-y-8 overflow-y-auto custom-scrollbar">
           <div>
-            <div className="px-3 mb-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">Project Hub</div>
+            <div className="px-3 mb-2 text-[11px] font-black text-slate-400 uppercase tracking-widest">Project Hub</div>
             <div className="space-y-0.5">
               <SidebarItem to="/" icon={<ICONS.Dashboard />} label="대시보드" />
               <SidebarItem to="/wbs" icon={<ICONS.WBS />} label="WBS 관리" />
@@ -189,7 +189,7 @@ const AppContent: React.FC<{
           </div>
 
           <div>
-            <div className="px-3 mb-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">Workspace</div>
+            <div className="px-3 mb-2 text-[11px] font-black text-slate-400 uppercase tracking-widest">Workspace</div>
             <div className="space-y-0.5">
               <SidebarItem to="/mytasks" icon={<ICONS.Kanban />} label="내 업무 보드" />
               <SidebarItem to="/reports" icon={<ICONS.Resource />} label="성과 리포트" />
@@ -198,7 +198,7 @@ const AppContent: React.FC<{
 
           {isStaff && (
             <div>
-              <div className="px-3 mb-2 text-[10px] font-black text-indigo-500 uppercase tracking-widest">Management</div>
+              <div className="px-3 mb-2 text-[11px] font-black text-indigo-500 uppercase tracking-widest">Management</div>
               <div className="space-y-0.5">
                 <SidebarItem to="/project" icon={<ICONS.Settings />} label="프로젝트 관리" />
                 <SidebarItem to="/resources" icon={<ICONS.Sparkles />} label="리소스 최적화" />
@@ -209,7 +209,7 @@ const AppContent: React.FC<{
 
           {currentUser.classification === 'Admin' && (
             <div>
-              <div className="px-3 mb-2 text-[10px] font-black text-rose-500 uppercase tracking-widest">System</div>
+              <div className="px-3 mb-2 text-[11px] font-black text-rose-500 uppercase tracking-widest">System</div>
               <div className="space-y-0.5">
                 <SidebarItem to="/organizations" icon={<ICONS.Settings />} label="이용기관 설정" />
                 <SidebarItem to="/data-management" icon={<ICONS.Dashboard />} label="데이터 관리" />
@@ -228,7 +228,7 @@ const AppContent: React.FC<{
           </div>
 
           <div className="space-y-1 px-1">
-            <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Switch Account</label>
+            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Switch Account</label>
             <select
               className="w-full bg-white border border-slate-200 text-[11px] font-bold text-slate-500 py-2 px-3 rounded-lg outline-none cursor-pointer hover:border-indigo-300 hover:text-indigo-600 transition-all shadow-sm"
               value={currentUser.id}
@@ -240,13 +240,13 @@ const AppContent: React.FC<{
             </select>
           </div>
 
-          <button onClick={handleLogout} className="w-full py-2.5 text-[11px] font-black text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all uppercase tracking-widest active:scale-95">
+          <button onClick={handleLogout} className="w-full py-2.5 text-[12px] font-black text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all uppercase tracking-widest active:scale-95">
             Logout
           </button>
         </div>
       </aside>
 
-      <div className="h-full flex flex-col bg-white overflow-hidden">
+      <div className="flex-1 h-full flex flex-col bg-white overflow-hidden">
         <header className="h-14 bg-white border-b border-slate-200 flex items-center justify-between px-6 flex-shrink-0 z-30">
           <div className="flex items-center gap-4">
             <div className="relative group w-64">
@@ -256,7 +256,7 @@ const AppContent: React.FC<{
               <input
                 type="text"
                 placeholder="PMS 검색..."
-                className="bg-slate-50 border border-slate-200 rounded-lg py-1.5 pl-9 pr-4 text-[12px] focus:bg-white focus:ring-2 focus:ring-indigo-100 outline-none w-full transition-all"
+                className="bg-slate-50 border border-slate-200 rounded-xl py-2 pl-9 pr-4 text-sm focus:bg-white focus:ring-2 focus:ring-indigo-100 outline-none w-full transition-all"
               />
             </div>
           </div>
@@ -264,7 +264,7 @@ const AppContent: React.FC<{
           <div className="flex items-center gap-4">
             {isProjectHub && accessibleProjects.length > 0 && (
               <select
-                className="bg-slate-900 text-white text-[11px] font-black py-1.5 px-4 rounded-lg outline-none border-none shadow-lg cursor-pointer max-w-[200px] animate-in fade-in slide-in-from-right-2 duration-300"
+                className="bg-slate-900 shadow-xl shadow-slate-200 text-white text-[12px] font-black py-2 px-4 rounded-xl outline-none border-none cursor-pointer max-w-[200px] animate-in fade-in slide-in-from-right-2 duration-300"
                 value={currentProjectId}
                 onChange={(e) => setCurrentProjectId(e.target.value)}
               >

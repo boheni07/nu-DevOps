@@ -146,11 +146,11 @@ const MyTasks: React.FC<MyTasksProps> = ({ tasks, setTasks, currentUser, project
       <div className="flex items-center justify-between px-2">
         <div>
           <h2 className="text-xl font-black text-slate-800 tracking-tight">내 업무 보드</h2>
-          <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] mt-0.5">Real-time Task Execution</p>
+          <p className="text-slate-400 text-[11px] font-black uppercase tracking-[0.2em] mt-0.5">Real-time Task Execution</p>
         </div>
         <div className="flex items-center gap-3">
           <select
-            className="bg-white border border-slate-200 px-4 py-2 rounded-xl text-[11px] font-black text-slate-600 outline-none shadow-sm focus:border-indigo-500 transition-all cursor-pointer"
+            className="bg-white border border-slate-200 px-4 py-2 rounded-xl text-sm font-black text-slate-600 outline-none shadow-sm focus:border-indigo-500 transition-all cursor-pointer"
             value={projectFilter}
             onChange={(e) => setProjectFilter(e.target.value)}
           >
@@ -178,8 +178,8 @@ const MyTasks: React.FC<MyTasksProps> = ({ tasks, setTasks, currentUser, project
             >
               <div className="flex items-center justify-between mb-4 px-1">
                 <div className="flex items-center gap-2">
-                  <span className={`w-2 h-2 rounded-full ${col.color}`}></span>
-                  <h3 className="text-[10px] font-black text-slate-500 tracking-[0.15em] uppercase">{col.title}</h3>
+                  <span className={`w-2.5 h-2.5 rounded-full ${col.color}`}></span>
+                  <h3 className="text-[12px] font-black text-slate-500 tracking-[0.15em] uppercase">{col.title}</h3>
                 </div>
                 <span className="text-[9px] font-black px-2 py-0.5 bg-white rounded-lg border border-slate-100 text-slate-400">{colTasks.length}</span>
               </div>
@@ -214,7 +214,7 @@ const MyTasks: React.FC<MyTasksProps> = ({ tasks, setTasks, currentUser, project
                       </div>
 
                       <div className="flex justify-between items-start gap-4">
-                        <h4 className="text-[13px] font-bold text-slate-800 leading-tight line-clamp-2 flex-1">
+                        <h4 className="text-sm font-bold text-slate-800 leading-tight line-clamp-2 flex-1">
                           {task.title}
                         </h4>
                         <div className="flex flex-col items-end gap-1 shrink-0">
@@ -250,8 +250,8 @@ const MyTasks: React.FC<MyTasksProps> = ({ tasks, setTasks, currentUser, project
                 </div>
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="text-[10px] text-indigo-500 font-black uppercase tracking-[0.1em]">ID: {selectedTask.id}</span>
-                    <span className={`text-[9px] font-black px-2 py-0.5 rounded-full ${selectedTask.status === 'Done' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}>{selectedTask.status.toUpperCase()}</span>
+                    <span className="text-[11px] text-indigo-500 font-black uppercase tracking-[0.1em]">ID: {selectedTask.id}</span>
+                    <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${selectedTask.status === 'Done' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}>{selectedTask.status.toUpperCase()}</span>
                   </div>
                   <h3 className="text-lg font-black text-slate-800 tracking-tight truncate w-[280px]">
                     {selectedTask.title}
@@ -269,15 +269,15 @@ const MyTasks: React.FC<MyTasksProps> = ({ tasks, setTasks, currentUser, project
               {/* 1. Schedule Management */}
               <section className="space-y-5">
                 <div className="flex items-center justify-between px-1">
-                  <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Schedule Management</h4>
-                  <span className="text-[10px] font-bold text-slate-300">Plan vs Actual</span>
+                  <h4 className="text-[12px] font-black text-slate-400 uppercase tracking-widest">Schedule Management</h4>
+                  <span className="text-[11px] font-bold text-slate-300">Plan vs Actual</span>
                 </div>
 
                 <div className="space-y-4">
                   {/* Planned Row - Read-only unless PM/Admin */}
                   <div className="grid grid-cols-2 gap-4">
                     <div className={`p-4 rounded-3xl border transition-all ${canEditPlanned ? 'bg-slate-50/50 border-slate-200' : 'bg-slate-100/50 border-slate-100 opacity-70 cursor-not-allowed'}`}>
-                      <label className="text-[9px] font-black text-slate-400 uppercase mb-2 block ml-1 flex items-center gap-1">
+                      <label className="text-[11px] font-black text-slate-400 uppercase mb-2 block ml-1 flex items-center gap-1">
                         Planned Start {!canEditPlanned && <svg className="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" /></svg>}
                       </label>
                       <input
@@ -289,7 +289,7 @@ const MyTasks: React.FC<MyTasksProps> = ({ tasks, setTasks, currentUser, project
                       />
                     </div>
                     <div className={`p-4 rounded-3xl border transition-all ${canEditPlanned ? 'bg-slate-50/50 border-slate-200' : 'bg-slate-100/50 border-slate-100 opacity-70 cursor-not-allowed'}`}>
-                      <label className="text-[9px] font-black text-slate-400 uppercase mb-2 block ml-1 flex items-center gap-1">
+                      <label className="text-[11px] font-black text-slate-400 uppercase mb-2 block ml-1 flex items-center gap-1">
                         Planned End {!canEditPlanned && <svg className="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" /></svg>}
                       </label>
                       <input
@@ -305,7 +305,7 @@ const MyTasks: React.FC<MyTasksProps> = ({ tasks, setTasks, currentUser, project
                   {/* Actual Row - Open for editing by assignee */}
                   <div className="grid grid-cols-2 gap-4">
                     <div className={`p-4 rounded-3xl border-2 transition-all ${selectedTask.actualStartDate ? 'bg-indigo-50/30 border-indigo-200 ring-4 ring-indigo-50' : 'bg-white border-slate-200 border-dashed hover:border-indigo-400'}`}>
-                      <label className={`text-[9px] font-black uppercase mb-2 block ml-1 ${selectedTask.actualStartDate ? 'text-indigo-600' : 'text-slate-400'}`}>Actual Start</label>
+                      <label className="text-[11px] font-black uppercase mb-2 block ml-1 shadow-sm px-2 py-0.5 rounded bg-indigo-50 w-fit text-indigo-600">Actual Start</label>
                       <input
                         type="date"
                         className="w-full bg-transparent text-[13px] font-black text-slate-800 outline-none cursor-pointer"
@@ -314,7 +314,7 @@ const MyTasks: React.FC<MyTasksProps> = ({ tasks, setTasks, currentUser, project
                       />
                     </div>
                     <div className={`p-4 rounded-3xl border-2 transition-all ${selectedTask.actualEndDate ? 'bg-emerald-50/30 border-emerald-200 ring-4 ring-emerald-50' : 'bg-white border-slate-200 border-dashed hover:border-emerald-400'}`}>
-                      <label className={`text-[9px] font-black uppercase mb-2 block ml-1 ${selectedTask.actualEndDate ? 'text-emerald-600' : 'text-slate-400'}`}>Actual End</label>
+                      <label className="text-[11px] font-black uppercase mb-2 block ml-1 shadow-sm px-2 py-0.5 rounded bg-emerald-50 w-fit text-emerald-600">Actual End</label>
                       <input
                         type="date"
                         className="w-full bg-transparent text-[13px] font-black text-slate-800 outline-none cursor-pointer"
@@ -339,7 +339,7 @@ const MyTasks: React.FC<MyTasksProps> = ({ tasks, setTasks, currentUser, project
               <section className="space-y-6 pt-4">
                 <div>
                   <div className="flex justify-between items-center mb-3 px-1">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Task Progress</label>
+                    <label className="text-[12px] font-black text-slate-400 uppercase tracking-widest">Task Progress</label>
                     <span className="text-lg font-black text-indigo-600">{selectedTask.progress}%</span>
                   </div>
                   <div className="p-5 bg-slate-50 rounded-3xl border border-slate-100">
@@ -358,7 +358,7 @@ const MyTasks: React.FC<MyTasksProps> = ({ tasks, setTasks, currentUser, project
                 </div>
 
                 <div>
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block ml-1">Task Specification</label>
+                  <label className="text-[12px] font-black text-slate-400 uppercase tracking-widest mb-2 block ml-1">Task Specification</label>
                   <textarea
                     className="w-full px-6 py-5 bg-slate-50 border border-slate-100 rounded-3xl text-[14px] font-medium text-slate-600 focus:border-indigo-400 focus:bg-white outline-none transition-all h-28 resize-none leading-relaxed"
                     placeholder="담당자 수행 지침 및 가이드를 입력하세요..."
@@ -375,8 +375,8 @@ const MyTasks: React.FC<MyTasksProps> = ({ tasks, setTasks, currentUser, project
               {/* 3. Daily Timeline Work Log (UPGRADED) */}
               <section className="space-y-5 pt-8 border-t border-slate-100">
                 <div className="flex items-center justify-between px-1">
-                  <h4 className="text-[11px] font-black text-slate-800 uppercase tracking-widest">Execution Timeline Log</h4>
-                  <span className="text-[10px] font-bold text-slate-400">Activity History</span>
+                  <h4 className="text-[12px] font-black text-slate-800 uppercase tracking-widest">Execution Timeline Log</h4>
+                  <span className="text-[11px] font-bold text-slate-400">Activity History</span>
                 </div>
 
                 {/* Input Form */}

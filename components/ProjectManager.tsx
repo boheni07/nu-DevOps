@@ -249,26 +249,26 @@ const ProjectManager: React.FC<ProjectManagerProps> = ({ projects, setProjects, 
   const employees = resources.filter(r => r.classification === 'Employee');
 
   return (
-    <div className="space-y-10 animate-in slide-in-from-bottom-4 duration-500 max-w-6xl mx-auto pb-12">
+    <div className="w-full max-w-[1600px] mx-auto space-y-8 animate-in fade-in duration-500">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-3xl font-black text-slate-800 tracking-tight">프로젝트 센터</h2>
-          <p className="text-slate-500 text-sm font-bold mt-1 uppercase tracking-tight">Enterprise Workspace Management</p>
+          <p className="text-slate-500 text-[12px] font-bold mt-1 uppercase tracking-tight">Enterprise Workspace Management</p>
         </div>
         {canCreateProject && (
           <div className="flex gap-4">
             {currentUser?.classification === 'Admin' && (
               <button
                 onClick={handleCreateStandardProject}
-                className="px-6 py-3.5 bg-emerald-600 text-white font-black rounded-2xl text-sm hover:bg-emerald-700 transition-all shadow-xl shadow-emerald-100/50 flex items-center gap-3 active:scale-[0.98]"
+                className="px-6 py-3.5 bg-emerald-600 text-white font-black rounded-xl text-sm hover:bg-emerald-700 transition-all shadow-xl shadow-emerald-100/50 flex items-center gap-3 active:scale-[0.98]"
               >
                 <ICONS.Sparkles className="w-5 h-5" />
-                표준프로젝트및WBS생성
+                표준 프로젝트 및 WBS 생성
               </button>
             )}
             <button
               onClick={openAddModal}
-              className="px-6 py-3.5 bg-indigo-600 text-white font-black rounded-2xl text-sm hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-100/50 flex items-center gap-3 active:scale-[0.98]"
+              className="px-6 py-3.5 bg-indigo-600 text-white font-black rounded-xl text-sm hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-100/50 flex items-center gap-3 active:scale-[0.98]"
             >
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
               새 프로젝트 등록
@@ -277,7 +277,7 @@ const ProjectManager: React.FC<ProjectManagerProps> = ({ projects, setProjects, 
         )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
         {projects.map(p => {
           const isActive = p.id === currentProjectId;
           const manager = resources.find(r => r.id === p.managerId);
@@ -292,43 +292,43 @@ const ProjectManager: React.FC<ProjectManagerProps> = ({ projects, setProjects, 
             >
               <div className="p-10">
                 <div className="flex justify-between items-start mb-8">
-                  <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${statusColors[p.status]}`}>
+                  <span className={`px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest ${statusColors[p.status]}`}>
                     {statusLabels[p.status]}
                   </span>
                   {isActive && (
-                    <div className="flex items-center gap-2 px-4 py-1.5 bg-indigo-50 rounded-full text-[10px] font-black text-indigo-600 uppercase tracking-widest shadow-sm">
+                    <div className="flex items-center gap-2 px-4 py-1.5 bg-indigo-50 rounded-full text-[11px] font-black text-indigo-600 uppercase tracking-widest shadow-sm">
                       <div className="w-2 h-2 bg-indigo-600 rounded-full animate-pulse"></div>
                       Current Active
                     </div>
                   )}
                 </div>
 
-                <div className="text-[11px] font-black text-indigo-500 uppercase tracking-widest mb-2">Project Name</div>
+                <div className="text-[12px] font-black text-indigo-500 uppercase tracking-widest mb-2">Project Name</div>
                 <h3 className="text-2xl font-black text-slate-800 mb-3 truncate group-hover:text-indigo-600 transition-colors">
                   {p.name}
                 </h3>
-                <p className="text-[14px] text-slate-500 line-clamp-2 h-10 mb-10 leading-relaxed font-medium">
+                <p className="text-sm text-slate-500 line-clamp-2 h-10 mb-10 leading-relaxed font-medium">
                   {p.description}
                 </p>
 
                 <div className="grid grid-cols-2 gap-4 mb-6">
                   <div className="bg-slate-50 p-5 rounded-[1.5rem] border border-slate-100">
-                    <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Project Manager</div>
+                    <div className="text-[12px] font-black text-slate-400 uppercase tracking-widest mb-2">Project Manager</div>
                     <div className="flex items-center gap-3">
                       <img src={manager?.avatar} className="w-7 h-7 rounded-xl border border-white shadow-sm" />
-                      <span className="text-[14px] text-slate-800 font-black">{manager?.name}</span>
+                      <span className="text-sm text-slate-800 font-black">{manager?.name}</span>
                     </div>
                   </div>
                   <div className="bg-slate-50 p-5 rounded-[1.5rem] border border-slate-100">
-                    <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Client / Partner</div>
-                    <span className="text-[14px] text-slate-800 font-black block truncate">
+                    <div className="text-[12px] font-black text-slate-400 uppercase tracking-widest mb-2">Client / Partner</div>
+                    <span className="text-sm text-slate-800 font-black block truncate">
                       {client ? `${client.department} (${client.name})` : '미지정'}
                     </span>
                   </div>
                 </div>
 
                 <div className="flex gap-4 mb-6">
-                  <div className="flex-1 text-[11px] font-bold text-slate-400 px-1">
+                  <div className="flex-1 text-[12px] font-bold text-slate-400 px-1">
                     <ICONS.Gantt className="w-3 h-3 inline mr-2 opacity-50" />
                     {p.startDate} ~ {p.endDate}
                   </div>
@@ -338,7 +338,7 @@ const ProjectManager: React.FC<ProjectManagerProps> = ({ projects, setProjects, 
                   <button
                     onClick={() => setCurrentProjectId(p.id)}
                     disabled={isActive}
-                    className={`flex-1 py-3.5 rounded-2xl text-[13px] font-black transition-all active:scale-[0.98] ${isActive
+                    className={`flex-1 py-3.5 rounded-xl text-sm font-black transition-all active:scale-[0.98] ${isActive
                       ? 'bg-slate-100 text-slate-400 cursor-default shadow-none border border-slate-200'
                       : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-xl shadow-indigo-100/30'
                       }`}
@@ -349,13 +349,13 @@ const ProjectManager: React.FC<ProjectManagerProps> = ({ projects, setProjects, 
                     <div className="flex gap-2">
                       <button
                         onClick={() => openEditModal(p)}
-                        className="px-5 py-3.5 bg-white text-slate-400 rounded-2xl hover:bg-slate-50 hover:text-slate-800 transition-all border-2 border-slate-100 group-hover:border-slate-200 active:scale-[0.98]"
+                        className="px-5 py-3.5 bg-white text-slate-400 rounded-xl hover:bg-slate-50 hover:text-slate-800 transition-all border-2 border-slate-100 group-hover:border-slate-200 active:scale-[0.98]"
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125" /></svg>
                       </button>
                       <button
                         onClick={() => confirmDelete(p)}
-                        className="px-5 py-3.5 bg-white text-rose-400 rounded-2xl hover:bg-rose-50 hover:text-rose-600 transition-all border-2 border-rose-50 active:scale-[0.98]"
+                        className="px-5 py-3.5 bg-white text-rose-400 rounded-xl hover:bg-rose-50 hover:text-rose-600 transition-all border-2 border-rose-50 active:scale-[0.98]"
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.34 9m-4.74 0-.34-9m9.26-2.3b-1.17-.16T14.5 3c-1.17 0-2.3.16-3.47.33L10 3.5m0 0V2.25A2.25 2.25 0 0 1 12.25 0h1.5A2.25 2.25 0 0 1 16 2.25V3.5m-7.5 0h7.5m-9 0h10.5M4.5 6.45V19.5A2.25 2.25 0 0 0 6.75 21.75h10.5a2.25 2.25 0 0 0 2.25-2.25V6.45M3.75 6h16.5" /></svg>
                       </button>
@@ -383,51 +383,51 @@ const ProjectManager: React.FC<ProjectManagerProps> = ({ projects, setProjects, 
               <fieldset disabled={editingProject ? !canEditProject(editingProject) : !canCreateProject} className="space-y-5">
                 <div className="grid grid-cols-2 gap-5">
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-black text-indigo-500 uppercase tracking-widest ml-1">Project ID</label>
-                    <input required type="text" className="w-full px-5 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl text-[14px] font-black text-slate-800 focus:border-indigo-500 focus:bg-white outline-none transition-all" value={formData.id} onChange={e => setFormData({ ...formData, id: e.target.value })} />
+                    <label className="text-[12px] font-black text-indigo-500 uppercase tracking-widest ml-1">Project ID</label>
+                    <input required type="text" className="w-full px-5 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl text-sm font-black text-slate-800 focus:border-indigo-500 focus:bg-white outline-none transition-all" value={formData.id} onChange={e => setFormData({ ...formData, id: e.target.value })} />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-black text-indigo-500 uppercase tracking-widest ml-1">Project Name</label>
-                    <input required type="text" className="w-full px-5 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl text-[14px] font-black text-slate-800 focus:border-indigo-500 focus:bg-white outline-none transition-all" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} />
+                    <label className="text-[12px] font-black text-indigo-500 uppercase tracking-widest ml-1">Project Name</label>
+                    <input required type="text" className="w-full px-5 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl text-sm font-black text-slate-800 focus:border-indigo-500 focus:bg-white outline-none transition-all" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} />
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Description (주요 목표)</label>
-                  <textarea required className="w-full px-5 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl text-[13px] font-bold text-slate-700 focus:border-indigo-500 focus:bg-white outline-none transition-all h-20 resize-none leading-relaxed" value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} />
+                  <label className="text-[12px] font-black text-slate-400 uppercase tracking-widest ml-1">Description (주요 목표)</label>
+                  <textarea required className="w-full px-5 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl text-sm font-bold text-slate-700 focus:border-indigo-500 focus:bg-white outline-none transition-all h-20 resize-none leading-relaxed" value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} />
                 </div>
 
                 <div className="grid grid-cols-2 gap-5">
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Start Date</label>
-                    <input type="date" className="w-full px-5 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl text-[13px] font-bold text-slate-700" value={formData.startDate} onChange={e => setFormData({ ...formData, startDate: e.target.value })} />
+                    <label className="text-[12px] font-black text-slate-400 uppercase tracking-widest ml-1">Start Date</label>
+                    <input type="date" className="w-full px-5 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl text-sm font-bold text-slate-700" value={formData.startDate} onChange={e => setFormData({ ...formData, startDate: e.target.value })} />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">End Date</label>
-                    <input type="date" className="w-full px-5 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl text-[13px] font-bold text-slate-700" value={formData.endDate} onChange={e => setFormData({ ...formData, endDate: e.target.value })} />
+                    <label className="text-[12px] font-black text-slate-400 uppercase tracking-widest ml-1">End Date</label>
+                    <input type="date" className="w-full px-5 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl text-sm font-bold text-slate-700" value={formData.endDate} onChange={e => setFormData({ ...formData, endDate: e.target.value })} />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Client (고객사/담당자)</label>
-                    <select className="w-full px-5 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl text-[12px] font-bold text-slate-800 outline-none appearance-none" value={formData.clientId} onChange={e => setFormData({ ...formData, clientId: e.target.value })}>
+                    <label className="text-[12px] font-black text-slate-400 uppercase tracking-widest ml-1">Client (고객사/담당자)</label>
+                    <select className="w-full px-5 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl text-sm font-bold text-slate-800 outline-none appearance-none" value={formData.clientId} onChange={e => setFormData({ ...formData, clientId: e.target.value })}>
                       {clients.map(res => (
                         <option key={res.id} value={res.id}>{res.name} ({res.department})</option>
                       ))}
                     </select>
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-black text-indigo-600 uppercase tracking-widest ml-1">PM (Project Manager)</label>
-                    <select className="w-full px-5 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl text-[12px] font-bold text-slate-800 outline-none appearance-none" value={formData.managerId} onChange={e => setFormData({ ...formData, managerId: e.target.value })}>
+                    <label className="text-[12px] font-black text-indigo-600 uppercase tracking-widest ml-1">PM (Project Manager)</label>
+                    <select className="w-full px-5 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl text-sm font-bold text-slate-800 outline-none appearance-none" value={formData.managerId} onChange={e => setFormData({ ...formData, managerId: e.target.value })}>
                       {employees.filter(res => res.id !== formData.plId).map(res => (
                         <option key={res.id} value={res.id}>{res.name} ({res.role})</option>
                       ))}
                     </select>
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">PL (Project Leader)</label>
-                    <select className="w-full px-5 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl text-[12px] font-bold text-slate-800 outline-none appearance-none" value={formData.plId} onChange={e => setFormData({ ...formData, plId: e.target.value })}>
+                    <label className="text-[12px] font-black text-slate-400 uppercase tracking-widest ml-1">PL (Project Leader)</label>
+                    <select className="w-full px-5 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl text-sm font-bold text-slate-800 outline-none appearance-none" value={formData.plId} onChange={e => setFormData({ ...formData, plId: e.target.value })}>
                       <option value="">선택 안함</option>
                       {employees.filter(res => res.id !== formData.managerId).map(res => (
                         <option key={res.id} value={res.id}>{res.name} ({res.role})</option>
@@ -437,15 +437,15 @@ const ProjectManager: React.FC<ProjectManagerProps> = ({ projects, setProjects, 
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Notes (참고사항)</label>
-                  <textarea className="w-full px-5 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl text-[13px] font-bold text-slate-700 focus:border-indigo-500 focus:bg-white outline-none transition-all h-20 resize-none" placeholder="보안 규정, 특별 라이선스, 협력 업체 정보 등..." value={formData.notes} onChange={e => setFormData({ ...formData, notes: e.target.value })} />
+                  <label className="text-[12px] font-black text-slate-400 uppercase tracking-widest ml-1">Notes (참고사항)</label>
+                  <textarea className="w-full px-5 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl text-sm font-bold text-slate-700 focus:border-indigo-500 focus:bg-white outline-none transition-all h-20 resize-none" placeholder="보안 규정, 특별 라이선스, 협력 업체 정보 등..." value={formData.notes} onChange={e => setFormData({ ...formData, notes: e.target.value })} />
                 </div>
               </fieldset>
 
               <div className="pt-4 flex gap-4">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-4 bg-slate-100 text-slate-600 font-black rounded-2xl hover:bg-slate-200 transition-all active:scale-[0.98] text-sm">취소하기</button>
+                <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-4 bg-slate-100 text-slate-600 font-black rounded-xl hover:bg-slate-200 transition-all active:scale-[0.98] text-sm">취소하기</button>
                 {(editingProject ? canEditProject(editingProject) : canCreateProject) && (
-                  <button type="submit" className="flex-1 py-4 bg-indigo-600 text-white font-black rounded-2xl hover:bg-indigo-700 shadow-xl shadow-indigo-100/30 transition-all active:scale-[0.98] text-sm">프로젝트 저장</button>
+                  <button type="submit" className="flex-1 py-4 bg-indigo-600 text-white font-black rounded-xl hover:bg-indigo-700 shadow-xl shadow-indigo-100/30 transition-all active:scale-[0.98] text-sm">프로젝트 저장</button>
                 )}
               </div>
             </form>
@@ -461,20 +461,20 @@ const ProjectManager: React.FC<ProjectManagerProps> = ({ projects, setProjects, 
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-10 h-10"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" /></svg>
               </div>
               <h3 className="text-2xl font-black text-slate-800 mb-4 tracking-tight">프로젝트 삭제</h3>
-              <p className="text-slate-500 font-bold leading-relaxed mb-8">
+              <p className="text-sm text-slate-500 font-bold leading-relaxed mb-8">
                 <span className="text-rose-600 font-black">"{projectToDelete.name}"</span> 프로젝트를 삭제하시겠습니까?<br />
                 삭제 시 프로젝트와 관련된 <span className="text-slate-800 font-black">WBS, 태스크, 리소스 할당 정보</span> 등 모든 데이터가 영구적으로 삭제됩니다.
               </p>
               <div className="flex gap-4">
                 <button
                   onClick={() => setIsDeleteModalOpen(false)}
-                  className="flex-1 py-4 bg-slate-50 text-slate-500 font-black rounded-2xl hover:bg-slate-100 transition-all active:scale-[0.98]"
+                  className="flex-1 py-4 bg-slate-50 text-slate-500 font-black rounded-xl hover:bg-slate-100 transition-all active:scale-[0.98]"
                 >
                   취소
                 </button>
                 <button
                   onClick={handleDelete}
-                  className="flex-1 py-4 bg-rose-500 text-white font-black rounded-2xl hover:bg-rose-600 shadow-xl shadow-rose-200 transition-all active:scale-[0.98]"
+                  className="flex-1 py-4 bg-rose-500 text-white font-black rounded-xl hover:bg-rose-600 shadow-xl shadow-rose-200 transition-all active:scale-[0.98]"
                 >
                   영구 삭제
                 </button>
@@ -493,14 +493,14 @@ const ProjectManager: React.FC<ProjectManagerProps> = ({ projects, setProjects, 
                 <ICONS.Sparkles className="w-10 h-10 text-indigo-500 animate-pulse" />
               </div>
               <h3 className="text-2xl font-black text-slate-800 mb-2 tracking-tight">생성이 완료되었습니다!</h3>
-              <p className="text-slate-500 text-[14px] font-bold leading-relaxed mb-8">
+              <p className="text-sm text-slate-500 font-bold leading-relaxed mb-8">
                 <span className="text-indigo-600 font-black">"SW개발 표준 프로젝트"</span>와<br />
                 <span className="text-slate-800 px-1">26개의 표준 WBS 항목</span>이<br />
                 성공적으로 준비되었습니다.
               </p>
               <button
                 onClick={() => setIsSuccessModalOpen(false)}
-                className="w-full py-4.5 bg-indigo-600 text-white font-black rounded-2xl hover:bg-indigo-700 shadow-xl shadow-indigo-100 active:scale-[0.98] transition-all"
+                className="w-full py-4.5 bg-indigo-600 text-white font-black rounded-xl hover:bg-indigo-700 shadow-xl shadow-indigo-100 active:scale-[0.98] transition-all"
               >
                 지금 확인하러 가기
               </button>

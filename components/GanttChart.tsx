@@ -8,25 +8,24 @@ interface GanttChartProps {
 }
 
 const GanttChart: React.FC<GanttChartProps> = ({ tasks, project }) => {
-  const [zoom, setZoom] = useState<'day' | 'week'>('day');
+  const [zoom, setZoom] = useState<'day' | 'week'>('week');
   const [cellWidth, setCellWidth] = useState(28);
 
   const headerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
 
-  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    const { scrollLeft, scrollTop } = e.currentTarget;
-    if (headerRef.current) headerRef.current.scrollLeft = scrollLeft;
-    if (listRef.current) listRef.current.scrollTop = scrollTop;
+  // 셀 너비 자동 조절 (Fit to width)
+  const fitToWidth = (totalPeriods: number) => {
+    if (chartRef.current && totalPeriods > 0) {
+      const containerWidth = chartRef.current.clientWidth;
+      const newWidth = Math.max(containerWidth / totalPeriods, 5); // 최소 5px 보장
+      setCellWidth(newWidth);
+    }
   };
 
-  useEffect(() => {
-    setCellWidth(zoom === 'day' ? 28 : 70);
-  }, [zoom]);
-
-  const { periods, periodMap, minDate } = useMemo(() => {
-    if (tasks.length === 0 && !project) return { periods: [], periodMap: new Map<string, number>(), minDate: new Date() };
+  const { periods, periodMap, minDate, months } = useMemo(() => {
+    if (tasks.length === 0 && !project) return { periods: [], periodMap: new Map<string, number>(), minDate: new Date(), months: [] };
 
     // 프로젝트 기간 기준으로 설정
     let min = new Date(project.startDate);
@@ -38,9 +37,26 @@ const GanttChart: React.FC<GanttChartProps> = ({ tasks, project }) => {
 
     const periodList: { label: string; date: Date }[] = [];
     const map = new Map<string, number>();
+    const monthList: { label: string; count: number }[] = [];
 
     const diffTime = Math.abs(max.getTime() - min.getTime());
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    let currentMonthLabel = '';
+    let currentMonthCount = 0;
+
+    const addMonth = (date: Date) => {
+      const label = `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}`;
+      if (label !== currentMonthLabel) {
+        if (currentMonthLabel) {
+          monthList.push({ label: currentMonthLabel, count: currentMonthCount });
+        }
+        currentMonthLabel = label;
+        currentMonthCount = 1;
+      } else {
+        currentMonthCount++;
+      }
+    };
 
     if (zoom === 'day') {
       let index = 0;
@@ -54,6 +70,7 @@ const GanttChart: React.FC<GanttChartProps> = ({ tasks, project }) => {
           const key = d.toISOString().split('T')[0];
           periodList.push({ label: `${d.getDate()}`, date: d });
           map.set(key, index++);
+          addMonth(d);
         }
       }
     } else {
@@ -71,7 +88,10 @@ const GanttChart: React.FC<GanttChartProps> = ({ tasks, project }) => {
         const d = new Date(startMonday);
         d.setDate(d.getDate() + i);
 
-        const label = `${d.getMonth() + 1}.${d.getDate()}~`;
+        // 주간 보기에서는 시작일 기준으로 월 계산
+        addMonth(d);
+
+        const label = `${d.getDate()}~`;
 
         periodList.push({ label, date: d });
 
@@ -85,8 +105,34 @@ const GanttChart: React.FC<GanttChartProps> = ({ tasks, project }) => {
       }
     }
 
-    return { periods: periodList, periodMap: map, minDate: min };
+    if (currentMonthLabel) {
+      monthList.push({ label: currentMonthLabel, count: currentMonthCount });
+    }
+
+    return { periods: periodList, periodMap: map, minDate: min, months: monthList };
   }, [tasks, zoom, project]);
+
+  // 데이터 변경, 줌 변경, 리사이즈 시 너비 재계산
+  useEffect(() => {
+    fitToWidth(periods.length);
+
+    const resizeObserver = new ResizeObserver(() => {
+      fitToWidth(periods.length);
+    });
+
+    if (chartRef.current) {
+      resizeObserver.observe(chartRef.current);
+    }
+
+    return () => resizeObserver.disconnect();
+  }, [periods.length, zoom]);
+
+
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const { scrollLeft, scrollTop } = e.currentTarget;
+    if (headerRef.current) headerRef.current.scrollLeft = scrollLeft;
+    if (listRef.current) listRef.current.scrollTop = scrollTop;
+  };
 
   const flattenedTasks = useMemo(() => {
     const result: { task: Task; depth: number; wbsNo: string }[] = [];
@@ -146,12 +192,12 @@ const GanttChart: React.FC<GanttChartProps> = ({ tasks, project }) => {
       <div className="flex items-center justify-between p-6 bg-slate-50/30 border-b border-slate-100 shrink-0">
         <div>
           <h2 className="text-2xl font-black text-slate-800 tracking-tight">Gantt Chart</h2>
-          <p className="text-slate-400 text-[11px] font-black mt-1 uppercase tracking-[0.2em]">{project.name} 일정 현황</p>
+          <p className="text-slate-400 text-[12px] font-black mt-1 uppercase tracking-[0.2em]">{project.name} 일정 현황</p>
         </div>
 
         <div className="flex items-center gap-4 bg-white p-1.5 rounded-2xl border border-slate-200 shadow-sm">
           <div className="flex items-center gap-3 border-r border-slate-100 pr-4 ml-2">
-            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Scale</span>
+            <span className="text-[12px] font-black text-slate-400 uppercase tracking-widest">Scale</span>
             <input
               type="range"
               min="15"
@@ -165,11 +211,11 @@ const GanttChart: React.FC<GanttChartProps> = ({ tasks, project }) => {
           <div className="flex bg-slate-50 p-1 rounded-xl border border-slate-100">
             <button
               onClick={() => setZoom('day')}
-              className={`px-3 py-1 rounded-lg text-[11px] font-black transition-all ${zoom === 'day' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-100' : 'text-slate-400 hover:text-slate-600'}`}
+              className={`px-3 py-1 rounded-lg text-[12px] font-black transition-all ${zoom === 'day' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-100' : 'text-slate-400 hover:text-slate-600'}`}
             >일간</button>
             <button
               onClick={() => setZoom('week')}
-              className={`px-3 py-1 rounded-lg text-[10px] font-black transition-all ${zoom === 'week' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-100' : 'text-slate-400 hover:text-slate-600'}`}
+              className={`px-3 py-1 rounded-lg text-[12px] font-black transition-all ${zoom === 'week' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-100' : 'text-slate-400 hover:text-slate-600'}`}
             >주간</button>
           </div>
         </div>
@@ -177,30 +223,38 @@ const GanttChart: React.FC<GanttChartProps> = ({ tasks, project }) => {
 
       <div className="flex-1 flex flex-col overflow-hidden bg-white border-b border-slate-200">
         <div className="flex border-b border-slate-200 bg-slate-50 sticky top-0 z-20">
-          <div className="w-64 flex-shrink-0 p-2 border-r border-slate-200 font-black text-slate-400 text-[10px] uppercase tracking-[0.2em] flex items-center bg-slate-50 h-10">
+          <div className="w-64 flex-shrink-0 p-2 border-r border-slate-200 font-black text-slate-400 text-[11px] uppercase tracking-[0.2em] flex items-center bg-slate-50 h-14">
             Task Name
           </div>
           <div className="flex-1 overflow-x-hidden overflow-y-hidden bg-white" ref={headerRef}>
-            <div className="flex" style={{ width: `${periods.length * cellWidth}px` }}>
-              {periods.map((period, idx) => {
-                const isMonthStart = period.date.getDate() <= 7 && zoom === 'week' || (period.date.getDate() === 1 && zoom === 'day') || idx === 0;
-                return (
+            <div className="flex flex-col" style={{ width: `${periods.length * cellWidth}px` }}>
+              {/* Top Row: Year.Month */}
+              <div className="flex h-7 border-b border-slate-50">
+                {months.map((month, idx) => (
                   <div
                     key={idx}
-                    className={`flex-shrink-0 border-r border-slate-50 h-10 flex flex-col items-center justify-center relative ${zoom === 'week' ? 'bg-slate-50/30' : ''} text-slate-500`}
+                    className="flex-shrink-0 flex items-center justify-center font-black text-[10px] text-slate-500 bg-slate-50/50 border-r border-slate-100"
+                    style={{ width: `${month.count * cellWidth}px` }}
+                  >
+                    {month.label}
+                  </div>
+                ))}
+              </div>
+
+              {/* Bottom Row: Day or Week */}
+              <div className="flex h-7">
+                {periods.map((period, idx) => (
+                  <div
+                    key={idx}
+                    className="flex-shrink-0 border-r border-slate-50 flex flex-col items-center justify-center relative text-slate-500"
                     style={{ width: `${cellWidth}px` }}
                   >
-                    {isMonthStart && (
-                      <span className="font-black text-indigo-600 absolute top-1 text-[8px] whitespace-nowrap bg-indigo-50 px-1 py-0.5 rounded tracking-tighter">
-                        {period.date.getFullYear()}.{period.date.getMonth() + 1}
-                      </span>
-                    )}
-                    <span className={`font-black mt-1.5 ${cellWidth < 30 ? 'text-[8px]' : 'text-[10px]'}`}>
+                    <span className={`font-black ${cellWidth < 30 ? 'text-[8px]' : 'text-[10px]'}`}>
                       {period.label}
                     </span>
                   </div>
-                );
-              })}
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -213,7 +267,7 @@ const GanttChart: React.FC<GanttChartProps> = ({ tasks, project }) => {
                 className="flex items-center px-4 border-b border-slate-50 transition-colors hover:bg-slate-50"
                 style={{ height: `${ROW_HEIGHT}px`, paddingLeft: `${depth * 20 + 20}px` }}
               >
-                <span className={`text-[13px] truncate ${task.parentId ? 'text-slate-600 font-bold' : 'text-slate-800 font-black'}`}>
+                <span className={`text-sm truncate ${task.parentId ? 'text-slate-600 font-bold' : 'text-slate-800 font-black'}`}>
                   <span className="text-slate-400 mr-2 font-black">{wbsNo}</span>
                   {task.title}
                 </span>
@@ -316,7 +370,7 @@ const GanttChart: React.FC<GanttChartProps> = ({ tasks, project }) => {
 const LegendItem = ({ color, label }: { color: string; label: string }) => (
   <div className="flex items-center gap-2">
     <div className={`w-2.5 h-2.5 rounded-full ${color}`}></div>
-    <span className="text-[10px] font-black text-slate-600 uppercase tracking-tight">{label}</span>
+    <span className="text-[11px] font-black text-slate-600 uppercase tracking-tight">{label}</span>
   </div>
 );
 

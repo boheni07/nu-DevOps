@@ -340,8 +340,8 @@ const WBSManager: React.FC<WBSManagerProps> = ({ tasks, setTasks, resources, cur
             ) : (
               <div className="mr-2 w-3.5"></div>
             )}
-            <span className="text-[13px] font-black text-slate-500 mr-2">{task.wbsNo}</span>
-            <span className={`text-[13px] ${hasChildren ? 'font-black text-slate-800' : 'text-slate-600 font-bold'}`}>{task.title}</span>
+            <span className="text-sm font-black text-slate-500 mr-2">{task.wbsNo}</span>
+            <span className={`text-sm ${hasChildren ? 'font-black text-slate-800' : 'text-slate-600 font-bold'}`}>{task.title}</span>
           </div>
         </td>
         <td className="px-2 py-2">
@@ -349,12 +349,12 @@ const WBSManager: React.FC<WBSManagerProps> = ({ tasks, setTasks, resources, cur
             {assignee ? (
               <>
                 <img src={assignee.avatar} className="w-5 h-5 rounded-md object-cover border border-slate-100 shadow-sm" />
-                <span className="text-[12px] font-black text-slate-700">{assignee.name}</span>
+                <span className="text-sm text-slate-700">{assignee.name}</span>
               </>
             ) : <span className="text-[11px] text-slate-300 font-black italic uppercase tracking-tighter">Unassigned</span>}
           </div>
         </td>
-        <td className="px-2 py-2 text-[11px] font-black text-slate-400 tabular-nums">
+        <td className="px-2 py-2 text-sm text-slate-400 tabular-nums">
           {task.startDate} ~ {task.endDate}
         </td>
         <td className="px-2 py-2">
@@ -362,11 +362,11 @@ const WBSManager: React.FC<WBSManagerProps> = ({ tasks, setTasks, resources, cur
             <div className="flex-1 bg-slate-100 h-1.5 rounded-full overflow-hidden min-w-[60px]">
               <div className={`h-full transition-all duration-700 ${task.status === 'Done' ? 'bg-emerald-500' : 'bg-indigo-600'}`} style={{ width: `${task.progress}%` }}></div>
             </div>
-            <span className="text-[11px] font-black text-slate-800">{task.progress}%</span>
+            <span className="text-sm font-black text-slate-800">{task.progress}%</span>
           </div>
         </td>
         <td className="px-2 py-2">
-          <span className={`px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider ${task.status === 'Done' ? 'bg-emerald-50 text-emerald-600' :
+          <span className={`px-2 py-0.5 rounded-md text-[11px] font-black uppercase tracking-wider ${task.status === 'Done' ? 'bg-emerald-50 text-emerald-600' :
             task.status.includes('Delayed') ? 'bg-red-50 text-red-600' : 'bg-indigo-50 text-indigo-600'
             }`}>{task.status}</span>
         </td>
@@ -393,7 +393,7 @@ const WBSManager: React.FC<WBSManagerProps> = ({ tasks, setTasks, resources, cur
           <p className="text-slate-400 text-[11px] font-black mt-1 uppercase tracking-[0.2em]">계층형 공정 관리 시스템</p>
         </div>
         {canEdit && (
-          <button onClick={() => openAddModal()} className="px-5 py-2.5 bg-indigo-600 text-white font-black rounded-2xl text-xs hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100/50 active:scale-[0.98]">새 루트 업무 등록</button>
+          <button onClick={() => openAddModal()} className="px-5 py-2.5 bg-indigo-600 text-white font-black rounded-xl text-sm hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100/50 active:scale-[0.98]">새 업무 등록</button>
         )}
       </div>
 
@@ -408,12 +408,12 @@ const WBSManager: React.FC<WBSManagerProps> = ({ tasks, setTasks, resources, cur
           <table className="w-full text-left">
             <thead className="sticky top-0 z-10 bg-slate-50 border-b border-slate-200">
               <tr>
-                <th className="py-3 pl-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Task Name</th>
-                <th className="px-2 py-3 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Assignee</th>
-                <th className="px-2 py-3 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Schedule</th>
-                <th className="px-2 py-3 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Progress</th>
-                <th className="px-2 py-3 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Status</th>
-                <th className="pr-4 py-3 text-right text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Actions</th>
+                <th className="py-3 pl-4 text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">Task Name</th>
+                <th className="px-2 py-3 text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">Assignee</th>
+                <th className="px-2 py-3 text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">Schedule</th>
+                <th className="px-2 py-3 text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">Progress</th>
+                <th className="px-2 py-3 text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">Status</th>
+                <th className="pr-4 py-3 text-right text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -451,43 +451,43 @@ const WBSManager: React.FC<WBSManagerProps> = ({ tasks, setTasks, resources, cur
           <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm animate-in fade-in" onClick={() => setIsModalOpen(false)}></div>
           <div className="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-lg relative z-10 animate-in zoom-in-95 duration-200 overflow-hidden">
             <div className="px-10 py-8 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
-              <h3 className="text-2xl font-black text-slate-800 tracking-tight">{editingTask ? 'Task 상세 정보' : '신규 업무 등록'}</h3>
+              <h3 className="text-2xl font-black text-slate-800 tracking-tight">{editingTask ? '업무 상세 정보' : '신규 업무 등록'}</h3>
               <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-slate-600 p-2">✕</button>
             </div>
             <form onSubmit={handleSubmit} className="p-10 space-y-6">
               <fieldset disabled={!canEdit} className="space-y-6">
                 <div>
-                  <label className="text-[11px] font-black text-indigo-500 uppercase tracking-[0.2em] block mb-2 ml-1">Task Name (업무명)</label>
+                  <label className="text-[12px] font-black text-indigo-500 uppercase tracking-[0.2em] block mb-2 ml-1">Task Name (업무명)</label>
                   <input required className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-[16px] font-black text-slate-800 focus:border-indigo-600 focus:bg-white outline-none transition-all disabled:bg-slate-100 disabled:text-slate-500" value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} />
                 </div>
                 <div className="grid grid-cols-2 gap-6">
                   <div>
-                    <label className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-2 ml-1">Start Date</label>
-                    <input type="date" className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-[14px] font-bold text-slate-700 disabled:bg-slate-100 disabled:text-slate-500" value={formData.startDate} onChange={e => setFormData({ ...formData, startDate: e.target.value })} />
+                    <label className="text-[12px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-2 ml-1">시작일 (Start Date)</label>
+                    <input type="date" className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-bold text-slate-700 disabled:bg-slate-100 disabled:text-slate-500" value={formData.startDate} onChange={e => setFormData({ ...formData, startDate: e.target.value })} />
                   </div>
                   <div>
-                    <label className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-2 ml-1">End Date</label>
-                    <input type="date" className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-[14px] font-bold text-slate-700 disabled:bg-slate-100 disabled:text-slate-500" value={formData.endDate} onChange={e => setFormData({ ...formData, endDate: e.target.value })} />
+                    <label className="text-[12px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-2 ml-1">종료일 (End Date)</label>
+                    <input type="date" className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-bold text-slate-700 disabled:bg-slate-100 disabled:text-slate-500" value={formData.endDate} onChange={e => setFormData({ ...formData, endDate: e.target.value })} />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-6">
                   <div>
-                    <label className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-2 ml-1">Assignee</label>
-                    <select className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-[14px] font-bold text-slate-700 outline-none disabled:bg-slate-100 disabled:text-slate-500" value={formData.assigneeId} onChange={e => setFormData({ ...formData, assigneeId: e.target.value })}>
+                    <label className="text-[12px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-2 ml-1">담당자 (Assignee)</label>
+                    <select className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-bold text-slate-700 outline-none disabled:bg-slate-100 disabled:text-slate-500" value={formData.assigneeId} onChange={e => setFormData({ ...formData, assigneeId: e.target.value })}>
                       <option value="unassigned">미지정</option>
                       {resources.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
                     </select>
                   </div>
                   <div>
-                    <label className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-2 ml-1">Progress (%)</label>
+                    <label className="text-[12px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-2 ml-1">진척률 (Progress %)</label>
                     <input type="number" min="0" max="100" className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-[16px] font-black text-indigo-600 disabled:bg-slate-100 disabled:text-slate-500" value={formData.progress} onChange={e => setFormData({ ...formData, progress: parseInt(e.target.value) })} />
                   </div>
                 </div>
               </fieldset>
               <div className="pt-4 flex gap-4">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-4 bg-slate-100 text-slate-600 font-black rounded-2xl hover:bg-slate-200 transition-all active:scale-[0.98]">취소</button>
+                <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-4 bg-slate-100 text-slate-600 font-black rounded-xl hover:bg-slate-200 transition-all active:scale-[0.98]">취소</button>
                 {canEdit && (
-                  <button type="submit" className="flex-1 py-4 bg-indigo-600 text-white font-black rounded-2xl hover:bg-indigo-700 shadow-xl shadow-indigo-100 active:scale-[0.98] transition-all">정보 저장하기</button>
+                  <button type="submit" className="flex-1 py-4 bg-indigo-600 text-white font-black rounded-xl hover:bg-indigo-700 shadow-xl shadow-indigo-100 active:scale-[0.98] transition-all">정보 저장하기</button>
                 )}
               </div>
             </form>

@@ -221,7 +221,7 @@ const DataManagement: React.FC<DataManagementProps> = ({
     };
 
     return (
-        <div className="max-w-6xl mx-auto space-y-8 animate-in fade-in duration-500">
+        <div className="w-full max-w-[1600px] mx-auto space-y-8 animate-in fade-in duration-500">
             <div className="flex flex-col gap-2 mb-8">
                 <h2 className="text-3xl font-black text-slate-800">데이터 관리</h2>
                 <p className="text-slate-500 font-medium">시스템 데이터를 안전하게 백업하거나 복원, 초기화할 수 있습니다.</p>
