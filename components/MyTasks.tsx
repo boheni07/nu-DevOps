@@ -241,30 +241,30 @@ const MyTasks: React.FC<MyTasksProps> = ({ tasks, setTasks, currentUser, project
             onClick={() => setSelectedTask(null)}
           ></div>
 
-          <div className="fixed top-0 right-0 bottom-0 w-full max-w-[500px] bg-white z-[70] shadow-[-25px_0_60px_-15px_rgba(0,0,0,0.2)] flex flex-col animate-in slide-in-from-right duration-400">
+          <div className="fixed top-0 right-0 bottom-0 w-full max-w-[460px] bg-white z-[70] shadow-[-25px_0_60px_-15px_rgba(0,0,0,0.2)] flex flex-col animate-in slide-in-from-right duration-400">
             {/* Header */}
-            <div className="p-8 border-b border-slate-100 flex items-center justify-between sticky top-0 bg-white/80 backdrop-blur-md z-10">
-              <div className="flex items-center gap-5">
-                <div className="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-white font-black text-xl shadow-xl shadow-indigo-100">
+            <div className="p-5 border-b border-slate-100 flex items-center justify-between sticky top-0 bg-white/80 backdrop-blur-md z-10">
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-black text-lg shadow-xl shadow-indigo-100">
                   {projects.find(p => p.id === selectedTask.projectId)?.name.charAt(0)}
                 </div>
                 <div className="min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-[11px] text-indigo-500 font-black uppercase tracking-[0.1em]">ID: {selectedTask.id}</span>
-                    <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${selectedTask.status === 'Done' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}>{selectedTask.status.toUpperCase()}</span>
+                  <div className="flex items-center gap-2 mb-0.5">
+                    <span className="text-[10px] text-indigo-500 font-black uppercase tracking-[0.1em]">ID: {selectedTask.id}</span>
+                    <span className={`text-[9px] font-black px-1.5 py-0.5 rounded-full ${selectedTask.status === 'Done' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}>{selectedTask.status.toUpperCase()}</span>
                   </div>
-                  <h3 className="text-lg font-black text-slate-800 tracking-tight truncate w-[280px]">
+                  <h3 className="text-base font-black text-slate-800 tracking-tight truncate w-[240px]">
                     {selectedTask.title}
                   </h3>
                 </div>
               </div>
-              <button onClick={() => setSelectedTask(null)} className="p-2.5 hover:bg-slate-100 rounded-2xl transition-all text-slate-400 hover:text-slate-600 flex-shrink-0">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
+              <button onClick={() => setSelectedTask(null)} className="p-2 hover:bg-slate-100 rounded-xl transition-all text-slate-400 hover:text-slate-600 flex-shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
               </button>
             </div>
 
             {/* Content Area */}
-            <div className="flex-1 overflow-y-auto custom-scrollbar p-8 space-y-10">
+            <div className="flex-1 overflow-y-auto custom-scrollbar p-5 space-y-6">
 
               {/* 1. Schedule Management */}
               <section className="space-y-5">
@@ -275,27 +275,27 @@ const MyTasks: React.FC<MyTasksProps> = ({ tasks, setTasks, currentUser, project
 
                 <div className="space-y-4">
                   {/* Planned Row - Read-only unless PM/Admin */}
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className={`p-4 rounded-3xl border transition-all ${canEditPlanned ? 'bg-slate-50/50 border-slate-200' : 'bg-slate-100/50 border-slate-100 opacity-70 cursor-not-allowed'}`}>
-                      <label className="text-[11px] font-black text-slate-400 uppercase mb-2 block ml-1 flex items-center gap-1">
-                        Planned Start {!canEditPlanned && <svg className="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" /></svg>}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className={`p-3 rounded-2xl border transition-all ${canEditPlanned ? 'bg-slate-50/50 border-slate-200' : 'bg-slate-100/50 border-slate-100 opacity-70 cursor-not-allowed'}`}>
+                      <label className="text-[10px] font-black text-slate-400 uppercase mb-1.5 block ml-1 flex items-center gap-1">
+                        Planned Start {!canEditPlanned && <svg className="w-2 h-2" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" /></svg>}
                       </label>
                       <input
                         type="date"
                         disabled={!canEditPlanned}
-                        className={`w-full bg-transparent text-[13px] font-bold text-slate-700 outline-none ${!canEditPlanned ? 'pointer-events-none' : 'cursor-pointer'}`}
+                        className={`w-full bg-transparent text-[12px] font-bold text-slate-700 outline-none ${!canEditPlanned ? 'pointer-events-none' : 'cursor-pointer'}`}
                         value={selectedTask.startDate}
                         onChange={e => updateTaskDate('startDate', e.target.value)}
                       />
                     </div>
-                    <div className={`p-4 rounded-3xl border transition-all ${canEditPlanned ? 'bg-slate-50/50 border-slate-200' : 'bg-slate-100/50 border-slate-100 opacity-70 cursor-not-allowed'}`}>
-                      <label className="text-[11px] font-black text-slate-400 uppercase mb-2 block ml-1 flex items-center gap-1">
-                        Planned End {!canEditPlanned && <svg className="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" /></svg>}
+                    <div className={`p-3 rounded-2xl border transition-all ${canEditPlanned ? 'bg-slate-50/50 border-slate-200' : 'bg-slate-100/50 border-slate-100 opacity-70 cursor-not-allowed'}`}>
+                      <label className="text-[10px] font-black text-slate-400 uppercase mb-1.5 block ml-1 flex items-center gap-1">
+                        Planned End {!canEditPlanned && <svg className="w-2 h-2" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" /></svg>}
                       </label>
                       <input
                         type="date"
                         disabled={!canEditPlanned}
-                        className={`w-full bg-transparent text-[13px] font-bold text-slate-700 outline-none ${!canEditPlanned ? 'pointer-events-none' : 'cursor-pointer'}`}
+                        className={`w-full bg-transparent text-[12px] font-bold text-slate-700 outline-none ${!canEditPlanned ? 'pointer-events-none' : 'cursor-pointer'}`}
                         value={selectedTask.endDate}
                         onChange={e => updateTaskDate('endDate', e.target.value)}
                       />
@@ -303,21 +303,21 @@ const MyTasks: React.FC<MyTasksProps> = ({ tasks, setTasks, currentUser, project
                   </div>
 
                   {/* Actual Row - Open for editing by assignee */}
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className={`p-4 rounded-3xl border-2 transition-all ${selectedTask.actualStartDate ? 'bg-indigo-50/30 border-indigo-200 ring-4 ring-indigo-50' : 'bg-white border-slate-200 border-dashed hover:border-indigo-400'}`}>
-                      <label className="text-[11px] font-black uppercase mb-2 block ml-1 shadow-sm px-2 py-0.5 rounded bg-indigo-50 w-fit text-indigo-600">Actual Start</label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className={`p-3 rounded-2xl border-2 transition-all ${selectedTask.actualStartDate ? 'bg-indigo-50/30 border-indigo-200 ring-4 ring-indigo-50' : 'bg-white border-slate-200 border-dashed hover:border-indigo-400'}`}>
+                      <label className="text-[10px] font-black uppercase mb-1.5 block ml-1 shadow-sm px-1.5 py-0.5 rounded bg-indigo-50 w-fit text-indigo-600">Actual Start</label>
                       <input
                         type="date"
-                        className="w-full bg-transparent text-[13px] font-black text-slate-800 outline-none cursor-pointer"
+                        className="w-full bg-transparent text-[12px] font-black text-slate-800 outline-none cursor-pointer"
                         value={selectedTask.actualStartDate || ''}
                         onChange={e => updateTaskDate('actualStartDate', e.target.value)}
                       />
                     </div>
-                    <div className={`p-4 rounded-3xl border-2 transition-all ${selectedTask.actualEndDate ? 'bg-emerald-50/30 border-emerald-200 ring-4 ring-emerald-50' : 'bg-white border-slate-200 border-dashed hover:border-emerald-400'}`}>
-                      <label className="text-[11px] font-black uppercase mb-2 block ml-1 shadow-sm px-2 py-0.5 rounded bg-emerald-50 w-fit text-emerald-600">Actual End</label>
+                    <div className={`p-3 rounded-2xl border-2 transition-all ${selectedTask.actualEndDate ? 'bg-emerald-50/30 border-emerald-200 ring-4 ring-emerald-50' : 'bg-white border-slate-200 border-dashed hover:border-emerald-400'}`}>
+                      <label className="text-[10px] font-black uppercase mb-1.5 block ml-1 shadow-sm px-1.5 py-0.5 rounded bg-emerald-50 w-fit text-emerald-600">Actual End</label>
                       <input
                         type="date"
-                        className="w-full bg-transparent text-[13px] font-black text-slate-800 outline-none cursor-pointer"
+                        className="w-full bg-transparent text-[12px] font-black text-slate-800 outline-none cursor-pointer"
                         value={selectedTask.actualEndDate || ''}
                         onChange={e => updateTaskDate('actualEndDate', e.target.value)}
                       />
@@ -325,12 +325,12 @@ const MyTasks: React.FC<MyTasksProps> = ({ tasks, setTasks, currentUser, project
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 pt-2">
+                <div className="grid grid-cols-2 gap-3 pt-1">
                   {!selectedTask.actualStartDate && (
-                    <button onClick={() => setActualNow('start')} className="w-full h-12 bg-indigo-600 text-white rounded-2xl font-black text-[12px] shadow-xl shadow-indigo-100 hover:bg-indigo-700 transition-all active:scale-95">지금 업무 착수 기록</button>
+                    <button onClick={() => setActualNow('start')} className="w-full h-10 bg-indigo-600 text-white rounded-xl font-black text-[11px] shadow-xl shadow-indigo-100 hover:bg-indigo-700 transition-all active:scale-95">지금 업무 착수 기록</button>
                   )}
                   {selectedTask.actualStartDate && !selectedTask.actualEndDate && (
-                    <button onClick={() => setActualNow('end')} className="w-full h-12 bg-emerald-500 text-white rounded-2xl font-black text-[12px] shadow-xl shadow-emerald-100 hover:bg-emerald-600 transition-all active:scale-95 col-span-2">지금 업무 완료 처리</button>
+                    <button onClick={() => setActualNow('end')} className="w-full h-10 bg-emerald-500 text-white rounded-xl font-black text-[11px] shadow-xl shadow-emerald-100 hover:bg-emerald-600 transition-all active:scale-95 col-span-2">지금 업무 완료 처리</button>
                   )}
                 </div>
               </section>
@@ -342,10 +342,10 @@ const MyTasks: React.FC<MyTasksProps> = ({ tasks, setTasks, currentUser, project
                     <label className="text-[12px] font-black text-slate-400 uppercase tracking-widest">Task Progress</label>
                     <span className="text-lg font-black text-indigo-600">{selectedTask.progress}%</span>
                   </div>
-                  <div className="p-5 bg-slate-50 rounded-3xl border border-slate-100">
+                  <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100">
                     <input
                       type="range" min="0" max="100" step="5"
-                      className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+                      className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
                       value={selectedTask.progress}
                       onChange={e => {
                         const val = parseInt(e.target.value);
@@ -360,7 +360,7 @@ const MyTasks: React.FC<MyTasksProps> = ({ tasks, setTasks, currentUser, project
                 <div>
                   <label className="text-[12px] font-black text-slate-400 uppercase tracking-widest mb-2 block ml-1">Task Specification</label>
                   <textarea
-                    className="w-full px-6 py-5 bg-slate-50 border border-slate-100 rounded-3xl text-[14px] font-medium text-slate-600 focus:border-indigo-400 focus:bg-white outline-none transition-all h-28 resize-none leading-relaxed"
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-2xl text-[13px] font-medium text-slate-600 focus:border-indigo-400 focus:bg-white outline-none transition-all h-20 resize-none leading-relaxed"
                     placeholder="담당자 수행 지침 및 가이드를 입력하세요..."
                     value={selectedTask.description || ''}
                     onChange={e => {
@@ -380,37 +380,37 @@ const MyTasks: React.FC<MyTasksProps> = ({ tasks, setTasks, currentUser, project
                 </div>
 
                 {/* Input Form */}
-                <div className={`p-6 rounded-[2rem] border-2 transition-all ${selectedTask.actualStartDate ? 'bg-slate-50 border-slate-100 shadow-inner' : 'bg-slate-100/30 border-dashed border-slate-200 opacity-60'}`}>
+                <div className={`p-4 rounded-[1.5rem] border-2 transition-all ${selectedTask.actualStartDate ? 'bg-slate-50 border-slate-100 shadow-inner' : 'bg-slate-100/30 border-dashed border-slate-200 opacity-60'}`}>
                   {!selectedTask.actualStartDate ? (
-                    <div className="py-6 text-center">
-                      <p className="text-[12px] font-black text-slate-500 uppercase tracking-wider leading-relaxed">실제 업무 착수일이 기록된 이후에<br />업무일지 작성이 가능합니다.</p>
-                      <button onClick={() => setActualNow('start')} className="mt-4 text-[11px] font-black text-indigo-600 underline hover:text-indigo-800 transition-colors uppercase">지금 시작하기</button>
+                    <div className="py-4 text-center">
+                      <p className="text-[11px] font-black text-slate-500 uppercase tracking-wider leading-relaxed">실제 업무 착수일이 기록된 이후에<br />업무일지 작성이 가능합니다.</p>
+                      <button onClick={() => setActualNow('start')} className="mt-3 text-[10px] font-black text-indigo-600 underline hover:text-indigo-800 transition-colors uppercase">지금 시작하기</button>
                     </div>
                   ) : (
-                    <div className="space-y-4">
-                      <div className="flex gap-3">
-                        <div className="flex-shrink-0 w-36 relative">
+                    <div className="space-y-3">
+                      <div className="flex gap-2">
+                        <div className="flex-shrink-0 w-32 relative">
                           <input
                             type="date"
                             min={selectedTask.actualStartDate}
                             max={todayStr}
-                            className={`w-full px-4 py-3 bg-white border-2 rounded-2xl text-[12px] font-black outline-none transition-all ${isDateAlreadyLogged ? 'border-amber-200 text-amber-600' : 'border-slate-200 text-slate-700'}`}
+                            className={`w-full px-3 py-2 bg-white border-2 rounded-xl text-[11px] font-black outline-none transition-all ${isDateAlreadyLogged ? 'border-amber-200 text-amber-600' : 'border-slate-200 text-slate-700'}`}
                             value={logDate}
                             onChange={e => setLogDate(e.target.value)}
                           />
-                          {isDateAlreadyLogged && <span className="absolute -top-2.5 left-3 bg-amber-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded shadow-sm">작성 완료</span>}
+                          {isDateAlreadyLogged && <span className="absolute -top-2.5 left-2 bg-amber-500 text-white text-[7px] font-black px-1 py-0.5 rounded shadow-sm">작성 완료</span>}
                         </div>
                         <button
                           onClick={addWorkLog}
                           disabled={!logContent.trim() || isDateAlreadyLogged}
-                          className="flex-1 py-3 bg-indigo-600 text-white rounded-2xl text-[12px] font-black hover:bg-indigo-700 transition-all disabled:bg-slate-300 disabled:opacity-50 active:scale-95 shadow-lg shadow-indigo-100"
+                          className="flex-1 py-2 bg-indigo-600 text-white rounded-xl text-[11px] font-black hover:bg-indigo-700 transition-all disabled:bg-slate-300 disabled:opacity-50 active:scale-95 shadow-lg shadow-indigo-100"
                         >
                           {isDateAlreadyLogged ? '기록 존재' : '기록 추가'}
                         </button>
                       </div>
                       <textarea
-                        className="w-full px-5 py-3 bg-white border-2 border-slate-200 rounded-2xl text-[13px] font-medium text-slate-600 outline-none focus:border-indigo-400 h-20 resize-none"
-                        placeholder={isDateAlreadyLogged ? "선택한 날짜에는 이미 일지가 있습니다. 아래 타임라인에서 내용을 수정하세요." : "오늘 수행한 핵심 내용을 간결하게 기록하세요..."}
+                        className="w-full px-4 py-2 bg-white border-2 border-slate-200 rounded-xl text-[12px] font-medium text-slate-600 outline-none focus:border-indigo-400 h-16 resize-none"
+                        placeholder={isDateAlreadyLogged ? "선택한 날짜에는 이미 일지가 있습니다." : "수행 내용을 기록하세요..."}
                         disabled={isDateAlreadyLogged}
                         value={logContent}
                         onChange={e => setLogContent(e.target.value)}
@@ -428,10 +428,10 @@ const MyTasks: React.FC<MyTasksProps> = ({ tasks, setTasks, currentUser, project
 
                   {sortedWorkLogs.length > 0 ? (
                     sortedWorkLogs.map((log) => (
-                      <div key={log.id} className="flex items-center gap-5 p-4 bg-white border border-slate-100 rounded-2xl hover:bg-slate-50 group transition-all hover:shadow-md">
+                      <div key={log.id} className="flex items-center gap-3 p-3 bg-white border border-slate-100 rounded-xl hover:bg-slate-50 group transition-all hover:shadow-md">
                         {/* Date Component (Left) */}
-                        <div className="flex-shrink-0 w-20 text-center">
-                          <span className="text-[11px] font-black text-indigo-500 bg-indigo-50 px-2.5 py-1 rounded-lg tabular-nums">
+                        <div className="flex-shrink-0 w-16 text-center">
+                          <span className="text-[10px] font-black text-indigo-500 bg-indigo-50 px-2 py-0.5 rounded-md tabular-nums">
                             {log.date.split('-').slice(1).join('/')}
                           </span>
                         </div>
@@ -440,18 +440,17 @@ const MyTasks: React.FC<MyTasksProps> = ({ tasks, setTasks, currentUser, project
                         <div className="flex-1 min-w-0">
                           {editingLogId === log.id ? (
                             <div className="flex items-center gap-3">
-                              <input
-                                className="flex-1 px-4 py-2 text-[13px] border-2 border-indigo-200 rounded-xl outline-none font-bold bg-white"
+                              <textarea
+                                className="flex-1 px-4 py-2 text-[13px] border-2 border-indigo-200 rounded-xl outline-none font-bold bg-white min-h-[80px] resize-none leading-relaxed"
                                 value={editLogContent}
                                 onChange={e => setEditLogContent(e.target.value)}
                                 autoFocus
-                                onKeyDown={e => e.key === 'Enter' && saveEditLog()}
                               />
                               <button onClick={saveEditLog} className="text-[11px] font-black text-indigo-600 hover:underline">SAVE</button>
                               <button onClick={() => setEditingLogId(null)} className="text-[11px] font-bold text-slate-400 hover:underline">ESC</button>
                             </div>
                           ) : (
-                            <p className="text-[13px] text-slate-700 font-bold truncate group-hover:whitespace-normal transition-all leading-relaxed">
+                            <p className="text-[12px] text-slate-700 font-bold whitespace-pre-wrap transition-all leading-normal">
                               {log.content}
                             </p>
                           )}
@@ -483,13 +482,13 @@ const MyTasks: React.FC<MyTasksProps> = ({ tasks, setTasks, currentUser, project
             </div>
 
             {/* Footer */}
-            <div className="p-8 bg-white border-t border-slate-100 sticky bottom-0 z-10 shadow-[0_-15px_30px_-5px_rgba(0,0,0,0.05)]">
+            <div className="p-5 bg-white border-t border-slate-100 sticky bottom-0 z-10 shadow-[0_-15px_30px_-5px_rgba(0,0,0,0.05)]">
               <button
                 onClick={() => setSelectedTask(null)}
-                className="w-full py-7 bg-indigo-600 bg-gradient-to-r from-indigo-600 to-indigo-500 text-white rounded-2xl font-bold text-[15px] hover:from-indigo-700 hover:to-indigo-600 transition-all duration-300 shadow-lg shadow-indigo-200/50 hover:shadow-xl hover:shadow-indigo-300/50 hover:-translate-y-0.5 active:scale-[0.98] flex items-center justify-center gap-3"
+                className="w-full py-4 bg-indigo-600 bg-gradient-to-r from-indigo-600 to-indigo-500 text-white rounded-xl font-bold text-[14px] hover:from-indigo-700 hover:to-indigo-600 transition-all duration-300 shadow-lg shadow-indigo-200/50 hover:shadow-xl hover:shadow-indigo-300/50 hover:-translate-y-0.5 active:scale-[0.98] flex items-center justify-center gap-2"
               >
                 <span>모든 기록 저장 및 창 닫기</span>
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
               </button>
             </div>
           </div>

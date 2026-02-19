@@ -115,6 +115,9 @@ const ProjectManager: React.FC<ProjectManagerProps> = ({ projects, setProjects, 
     endDate.setMonth(today.getMonth() + 6);
 
     const projectId = `PRJ-STD-${Date.now().toString().slice(-4)}`;
+    const defaultEmployee = resources.find(r => r.classification === 'Employee');
+    const autoAssigneeId = defaultEmployee?.id || currentUser?.id || '';
+
     const newProject: Project = {
       id: projectId,
       name: 'SW개발 표준 프로젝트',
@@ -123,7 +126,7 @@ const ProjectManager: React.FC<ProjectManagerProps> = ({ projects, setProjects, 
       endDate: endDate.toISOString().split('T')[0],
       status: 'Active',
       clientId: resources.find(r => r.classification === 'Client')?.id || '',
-      managerId: currentUser?.id || resources[0]?.id || '',
+      managerId: autoAssigneeId,
       notes: '표준 WBS 26개 항목이 자동으로 생성되었습니다.'
     };
 
@@ -172,7 +175,7 @@ const ProjectManager: React.FC<ProjectManagerProps> = ({ projects, setProjects, 
           id: lastL1Id,
           projectId,
           title: item.l1,
-          assigneeId: currentUser?.id || '',
+          assigneeId: autoAssigneeId,
           status: 'To Do',
           priority: 'High',
           startDate: currentStartDate.toISOString().split('T')[0],
@@ -189,7 +192,7 @@ const ProjectManager: React.FC<ProjectManagerProps> = ({ projects, setProjects, 
           id: lastL2Id,
           projectId,
           title: item.l2,
-          assigneeId: currentUser?.id || '',
+          assigneeId: autoAssigneeId,
           status: 'To Do',
           priority: 'High',
           startDate: currentStartDate.toISOString().split('T')[0],
@@ -211,7 +214,7 @@ const ProjectManager: React.FC<ProjectManagerProps> = ({ projects, setProjects, 
         projectId,
         title: item.l3,
         description: item.l4,
-        assigneeId: currentUser?.id || '',
+        assigneeId: autoAssigneeId,
         status: 'To Do',
         priority: item.priority as Priority,
         startDate: currentStartDate.toISOString().split('T')[0],
@@ -357,7 +360,7 @@ const ProjectManager: React.FC<ProjectManagerProps> = ({ projects, setProjects, 
                         onClick={() => confirmDelete(p)}
                         className="px-5 py-3.5 bg-white text-rose-400 rounded-xl hover:bg-rose-50 hover:text-rose-600 transition-all border-2 border-rose-50 active:scale-[0.98]"
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.34 9m-4.74 0-.34-9m9.26-2.3b-1.17-.16T14.5 3c-1.17 0-2.3.16-3.47.33L10 3.5m0 0V2.25A2.25 2.25 0 0 1 12.25 0h1.5A2.25 2.25 0 0 1 16 2.25V3.5m-7.5 0h7.5m-9 0h10.5M4.5 6.45V19.5A2.25 2.25 0 0 0 6.75 21.75h10.5a2.25 2.25 0 0 0 2.25-2.25V6.45M3.75 6h16.5" /></svg>
+                        <ICONS.Trash className="w-5 h-5" />
                       </button>
                     </div>
                   )}
@@ -500,9 +503,10 @@ const ProjectManager: React.FC<ProjectManagerProps> = ({ projects, setProjects, 
               </p>
               <button
                 onClick={() => setIsSuccessModalOpen(false)}
-                className="w-full py-4.5 bg-indigo-600 text-white font-black rounded-xl hover:bg-indigo-700 shadow-xl shadow-indigo-100 active:scale-[0.98] transition-all"
+                className="w-full py-4.5 bg-indigo-600 bg-gradient-to-r from-indigo-600 to-indigo-500 text-white font-black rounded-xl hover:from-indigo-700 hover:to-indigo-600 shadow-xl shadow-indigo-100 hover:shadow-indigo-300/50 hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-3"
               >
-                지금 확인하러 가기
+                <span>지금 확인하러 가기</span>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
               </button>
             </div>
           </div>
