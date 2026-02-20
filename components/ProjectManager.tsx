@@ -338,30 +338,27 @@ const ProjectManager: React.FC<ProjectManagerProps> = ({ projects, setProjects, 
                 </div>
 
                 <div className="flex gap-4">
-                  <button
-                    onClick={() => setCurrentProjectId(p.id)}
-                    disabled={isActive}
-                    className={`flex-1 py-3.5 rounded-xl text-sm font-black transition-all active:scale-[0.98] ${isActive
-                      ? 'bg-slate-100 text-slate-400 cursor-default shadow-none border border-slate-200'
-                      : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-xl shadow-indigo-100/30'
-                      }`}
-                  >
-                    {isActive ? '현재 사용 중' : '워크스페이스 전환'}
-                  </button>
                   {canEdit && (
-                    <div className="flex gap-2">
+                    <>
                       <button
                         onClick={() => openEditModal(p)}
-                        className="px-5 py-3.5 bg-white text-slate-400 rounded-xl hover:bg-slate-50 hover:text-slate-800 transition-all border-2 border-slate-100 group-hover:border-slate-200 active:scale-[0.98]"
+                        className="flex-1 flex items-center justify-center gap-2 py-4 bg-white text-slate-600 font-black rounded-2xl hover:bg-slate-50 hover:text-indigo-600 transition-all border-2 border-slate-100 group-hover:border-slate-200 active:scale-[0.98] text-sm shadow-sm"
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125" /></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125" /></svg>
+                        수정하기
                       </button>
                       <button
                         onClick={() => confirmDelete(p)}
-                        className="px-5 py-3.5 bg-white text-rose-400 rounded-xl hover:bg-rose-50 hover:text-rose-600 transition-all border-2 border-rose-50 active:scale-[0.98]"
+                        className="flex-1 flex items-center justify-center gap-2 py-4 bg-rose-50 text-rose-500 font-black rounded-2xl hover:bg-rose-100 hover:text-rose-600 transition-all border-2 border-rose-100 active:scale-[0.98] text-sm shadow-sm"
                       >
-                        <ICONS.Trash className="w-5 h-5" />
+                        <ICONS.Trash className="w-4 h-4" />
+                        삭제하기
                       </button>
+                    </>
+                  )}
+                  {!canEdit && (
+                    <div className="flex-1 py-4 px-6 bg-slate-50 rounded-2xl border border-slate-100 text-center">
+                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">관리 권한 없음</span>
                     </div>
                   )}
                 </div>
