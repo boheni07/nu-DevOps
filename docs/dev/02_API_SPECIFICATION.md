@@ -25,6 +25,15 @@
 - `PATCH /api/v1/tasks/{id}`: 업무 상태 및 진행률 업데이트
 - `DELETE /api/v1/tasks/{id}`: 업무 삭제
 
+### Performance Reports
+- `GET /api/v1/reports`: 본인 또는 소속 프로젝트의 리포트 목록 조회
+- `POST /api/v1/reports`: 신규 리포트 생성 및 실적 집계
+- `PATCH /api/v1/reports/{id}`: 리포트 수정, 제출(Submit) 또는 승인(Approve) 처리
+
+### Work Logs
+- `POST /api/v1/tasks/{taskId}/logs`: 특정 업무에 대한 수행 로그 기록
+- `GET /api/v1/tasks/{taskId}/logs`: 업무별 로그 히스토리 조회
+
 ## 3. 인증 및 보안
 - **JWT (JSON Web Token)**: 헤더의 `Authorization: Bearer <token>`을 통해 사용자 인증을 수행합니다.
 - **RBAC (Role-Based Access Control)**: 사용자 권한(Admin, Employee, Client)에 따른 엔드포인트 접근 권한을 서버 측에서 철저히 검증합니다.

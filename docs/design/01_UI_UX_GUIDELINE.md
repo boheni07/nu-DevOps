@@ -25,3 +25,5 @@ Tailwind CSS 표준 컬러를 기반으로 하며, 의미에 따라 다음 색�
 - **Cards**: `bg-white`, `border-slate-200`, `rounded-xl`, `shadow-sm` 설정을 기본으로 합니다.
 - **Buttons**: 액션의 중요도에 따라 Solid, Outline, Ghost 스타일을 구분하여 적용합니다.
 - **Modals**: 사용자 작업 흐름을 방해하지 않도록 명확한 배경 오버레이와 간결한 입력 폼을 유지합니다.
+- **Reporting Tables**: 정보 밀도를 높이기 위해 패딩을 최소화하고 리스트 항목 간 경계선(`divide-y`)을 선명하게 유지합니다.
+- **Status Badges**: `Approved`(Emerald), `Submitted`(Indigo), `Draft`(Slate) 등 리포트 및 업무 상태에 따른 고정된 색상 테마를 적용합니다.

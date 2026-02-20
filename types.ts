@@ -79,3 +79,17 @@ export interface ProjectStats {
   overallProgress: number;
   resourceUtilization: number;
 }
+
+export interface PerformanceReport {
+  id: string;
+  projectId: string;
+  type: '일간' | '주간' | '월간';
+  startDate: string;
+  endDate: string;
+  generatedAt: string;
+  summary: string;
+  tasks: Task[];
+  logs: { task: Task; log: WorkLog }[];
+  status: 'Draft' | 'Submitted' | 'Approved';
+  reporterId: string;
+}

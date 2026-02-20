@@ -13,7 +13,7 @@
 
 2.  **Workspace**
     *   **My Tasks (Kanban Board)**: 개인에게 할당된 업무를 칸반 보드 형태로 관리합니다.
-    *   **Progress Reporting**: 프로젝트별, 개인별 성과 리포트를 제공합니다.
+    *   **Progress Reporting**: 프로젝트별, 개인별 성과 리포트를 제공합니다. 일간, 주간, 월간 단위의 실적 집계와 공식 업무 보고(Submit) 및 PM 승인(Approval) 워크플로우를 지원합니다.
 
 3.  **Management**
     *   **Project Manager**: 신규 프로젝트 생성 및 관리 기능을 제공합니다.

@@ -13,7 +13,7 @@ import ProjectManager from './components/ProjectManager';
 import Login from './components/Login';
 import OrganizationManager from './components/OrganizationManager';
 import DataManagement from './components/DataManagement';
-import { Task, Resource, Project, UserOrganization } from './types';
+import { Task, Resource, Project, UserOrganization, PerformanceReport } from './types';
 
 const INITIAL_PROJECTS: Project[] = [
   {
@@ -42,9 +42,41 @@ const INITIAL_PROJECTS: Project[] = [
 ];
 
 const INITIAL_TASKS: Task[] = [
-  { id: '1', projectId: 'PRJ-2024-ERP', title: '기획 및 전략 수립', assigneeId: 'unassigned', status: 'Done', priority: 'High', startDate: '2024-01-01', endDate: '2024-01-10', actualStartDate: '2024-01-01', actualEndDate: '2024-01-09', workingDays: 8, progress: 100 },
+  {
+    id: '1',
+    projectId: 'PRJ-2024-ERP',
+    title: '기획 및 전략 수립',
+    assigneeId: 'unassigned',
+    status: 'Done',
+    priority: 'High',
+    startDate: '2024-01-01',
+    endDate: '2024-01-10',
+    actualStartDate: '2024-01-01',
+    actualEndDate: '2024-01-09',
+    workingDays: 8,
+    progress: 100,
+    workLogs: [
+      { id: 'log-1', date: '2024-01-02', content: '요구사항 분석 및 범위 확정' },
+      { id: 'log-2', date: '2024-01-05', content: '전략 보고서 초안 작성 및 피드백 반영' }
+    ]
+  },
   { id: '2', projectId: 'PRJ-2024-ERP', title: '시스템 아키텍처 설계', parentId: '1', assigneeId: 'r1', status: 'Done', priority: 'High', startDate: '2024-01-02', endDate: '2024-01-08', actualStartDate: '2024-01-02', actualEndDate: '2024-01-08', workingDays: 5, progress: 100 },
-  { id: '3', projectId: 'PRJ-2024-ERP', title: '플랫폼 핵심 개발', assigneeId: 'unassigned', status: 'In Progress', priority: 'High', startDate: '2024-01-11', endDate: '2024-03-31', actualStartDate: '2024-01-12', workingDays: 57, progress: 45 },
+  {
+    id: '3',
+    projectId: 'PRJ-2024-ERP',
+    title: '플랫폼 핵심 개발',
+    assigneeId: 'unassigned',
+    status: 'In Progress',
+    priority: 'High',
+    startDate: '2024-01-11',
+    endDate: '2024-03-31',
+    actualStartDate: '2024-01-12',
+    workingDays: 57,
+    progress: 45,
+    workLogs: [
+      { id: 'log-3', date: new Date().toISOString().split('T')[0], content: '핵심 모듈 알고리즘 성능 최적화 진행 중' }
+    ]
+  },
   { id: '4', projectId: 'PRJ-2024-ERP', title: '프론트엔드 UI 컴포넌트', parentId: '3', assigneeId: 'r2', status: 'In Progress', priority: 'Medium', startDate: '2024-01-12', endDate: '2024-02-15', actualStartDate: '2024-01-12', workingDays: 25, progress: 70 },
   { id: '5', projectId: 'PRJ-2024-ERP', title: '백엔드 마이크로서비스 설계', parentId: '3', assigneeId: 'r1', status: 'To Do', priority: 'High', startDate: '2024-01-15', endDate: '2024-02-15', workingDays: 24, progress: 0 },
 ];
@@ -71,7 +103,6 @@ const INITIAL_ORGANIZATIONS: UserOrganization[] = [
   }
 ];
 
-// ... (Rest of App.tsx remains same, routing matches currentProject using enhanced properties)
 const SidebarItem: React.FC<{ to: string; icon: React.ReactNode; label: string }> = ({ to, icon, label }) => {
   const location = useLocation();
   const isActive = location.pathname === to || (to !== '/' && location.pathname.startsWith(to));
@@ -105,10 +136,12 @@ const AppContent: React.FC<{
   setCurrentProjectId: (id: string) => void;
   tasks: Task[];
   setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
+  reports: PerformanceReport[];
+  setReports: React.Dispatch<React.SetStateAction<PerformanceReport[]>>;
   handleLogin: (user: Resource) => void;
   handleLogout: () => void;
   handleSwitchAccount: (userId: string) => void;
-}> = ({ currentUser, resources, setResources, organizations, setOrganizations, projects, setProjects, currentProjectId, setCurrentProjectId, tasks, setTasks, handleLogin, handleLogout, handleSwitchAccount }) => {
+}> = ({ currentUser, resources, setResources, organizations, setOrganizations, projects, setProjects, currentProjectId, setCurrentProjectId, tasks, setTasks, reports, setReports, handleLogin, handleLogout, handleSwitchAccount }) => {
   const location = useLocation();
   const isProjectHub = ['/', '/wbs', '/gantt'].includes(location.pathname);
 
@@ -149,12 +182,10 @@ const AppContent: React.FC<{
     <div className="flex h-screen bg-slate-50">
       <aside className="w-52 bg-white border-r border-slate-200 flex flex-col flex-shrink-0 z-40 shadow-sm transition-all duration-300">
         <Link to="/" className="h-32 flex flex-col items-center justify-center px-4 border-b border-slate-100 relative overflow-hidden group bg-slate-50/30 cursor-pointer no-underline block">
-          {/* Decorative Background Elements */}
           <div className="absolute top-0 inset-x-0 h-0.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
           <div className="absolute -top-12 -right-12 w-32 h-32 bg-indigo-500/5 rounded-full blur-3xl group-hover:bg-indigo-500/10 transition-all duration-700"></div>
           <div className="absolute -bottom-12 -left-12 w-32 h-32 bg-purple-500/5 rounded-full blur-3xl group-hover:bg-purple-500/10 transition-all duration-700"></div>
 
-          {/* Logo Area */}
           <div className="relative z-10 mb-3 transition-transform duration-500 group-hover:scale-105 group-hover:-translate-y-1">
             {mainOrg?.ciLogo ? (
               <div className="p-3 bg-white rounded-2xl shadow-sm border border-slate-100 ring-4 ring-slate-50/50 backdrop-blur-sm">
@@ -167,7 +198,6 @@ const AppContent: React.FC<{
             )}
           </div>
 
-          {/* System Name Area */}
           <div className="flex flex-col items-center relative z-10">
             <span className="font-black text-xl tracking-tight leading-none bg-clip-text text-transparent bg-gradient-to-r from-slate-800 to-slate-600 group-hover:from-indigo-600 group-hover:to-purple-600 transition-all duration-500">
               nu-DevOps
@@ -282,7 +312,7 @@ const AppContent: React.FC<{
             <Route path="/wbs" element={currentProject ? <WBSManager tasks={filteredTasks} setTasks={(newTasks) => setTasks(prev => [...prev.filter(t => t.projectId !== currentProjectId), ...newTasks])} resources={resources} currentUser={currentUser} currentProjectId={currentProjectId} projects={projects} /> : <Navigate to="/" />} />
             <Route path="/gantt" element={currentProject ? <GanttChart tasks={filteredTasks} project={currentProject} /> : <Navigate to="/" />} />
             <Route path="/mytasks" element={<MyTasks tasks={tasks} setTasks={setTasks} currentUser={currentUser} projects={projects} />} />
-            <Route path="/reports" element={<ProgressReporting tasks={tasks} resources={resources} projects={projects} />} />
+            <Route path="/reports" element={<ProgressReporting tasks={tasks} resources={resources} projects={projects} reports={reports} setReports={setReports} currentUser={currentUser} />} />
             <Route path="/members" element={isStaff ? <MemberManager resources={resources} setResources={setResources} currentUser={currentUser} organizations={organizations} /> : <Navigate to="/" />} />
             <Route path="/resources" element={isStaff ? <ResourceOptimizer tasks={filteredTasks} resources={resources} /> : <Navigate to="/" />} />
             <Route path="/project" element={isStaff ? <ProjectManager projects={projects} setProjects={setProjects} tasks={tasks} setTasks={setTasks} currentProjectId={currentProjectId} setCurrentProjectId={setCurrentProjectId} resources={resources} currentUser={currentUser} /> : <Navigate to="/" />} />
@@ -305,10 +335,18 @@ const App: React.FC = () => {
     const saved = localStorage.getItem('nexus_organizations');
     return saved ? JSON.parse(saved) : INITIAL_ORGANIZATIONS;
   });
+  const [reports, setReports] = useState<PerformanceReport[]>(() => {
+    const saved = localStorage.getItem('nexus_reports');
+    return saved ? JSON.parse(saved) : [];
+  });
 
   useEffect(() => {
     localStorage.setItem('nexus_organizations', JSON.stringify(organizations));
   }, [organizations]);
+
+  useEffect(() => {
+    localStorage.setItem('nexus_reports', JSON.stringify(reports));
+  }, [reports]);
 
   const handleLogin = (user: Resource) => {
     setCurrentUser(user);
@@ -352,6 +390,8 @@ const App: React.FC = () => {
         setCurrentProjectId={setCurrentProjectId}
         tasks={tasks}
         setTasks={setTasks}
+        reports={reports}
+        setReports={setReports}
         handleLogin={handleLogin}
         handleLogout={handleLogout}
         handleSwitchAccount={handleSwitchAccount}

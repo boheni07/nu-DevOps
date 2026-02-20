@@ -33,6 +33,24 @@
 - `start_date`: DATE
 - `end_date`: DATE
 
+### `work_logs` (업무 일지)
+- `id`: UUID (Primary Key)
+- `task_id`: UUID (Foreign Key)
+- `date`: DATE
+- `content`: TEXT
+- `created_at`: TIMESTAMP WITH TIME ZONE
+
+### `performance_reports` (성과 리포트)
+- `id`: UUID (Primary Key)
+- `project_id`: VARCHAR(50) (Foreign Key)
+- `reporter_id`: UUID (Foreign Key to users)
+- `type`: ENUM ('daily', 'weekly', 'monthly')
+- `start_date`: DATE
+- `end_date`: DATE
+- `summary`: TEXT
+- `status`: ENUM ('draft', 'submitted', 'approved')
+- `generated_at`: TIMESTAMP WITH TIME ZONE
+
 ## 2. 성능 최적화 전략
 - **인덱싱**: `project_id` 및 `assignee_id`에 인덱스를 생성하여 조인 성능 최적화.
 - **계층형 쿼리**: WBS 구조 조회를 위해 `WITH RECURSIVE` 구문 활용 권장.

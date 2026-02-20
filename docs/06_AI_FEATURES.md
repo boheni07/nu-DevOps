@@ -4,10 +4,10 @@ nu-DevOps는 Google의 **Gemini AI**를 활용하여 단순한 관리를 넘어,
 
 ## 1. 핵심 AI 기능
 
-### 📊 AI 진행 보고서 (Progress Report)
-- **위치**: Dashboard > 'AI 브리핑' 버튼
-- **기능**: 현재 프로젝트의 모든 일감(Task)과 자원(Resource) 현황을 분석하여 마크다운 형식의 보고서를 자동 생성합니다.
-- **포함 내용**: Executive Summary, 주요 성과, 위험 요소 분석, 향후 권장 사항.
+### 📊 AI 진행 보고서 (Progress Report Integration)
+- **위치**: Dashboard > 'AI 브리핑' 버튼 / Workspace > 성과 리포트
+- **기능**: 현재 프로젝트의 모든 업무(Task)와 자원(Resource) 데이터를 분석하여 마크다운 및 텍스트 기반의 보고서 요약을 자동 생성합니다.
+- **포함 내용**: Executive Summary, 주요 성과 지표, 리스크 분석, 향후 업무 권장 사항. 성과 리포트의 '종합 의견' 작성 시 AI 인사이트를 활용할 수 있습니다.
 
 ### ⚙️ 지능형 리소스 최적화 (Resource Optimizer)
 - **위치**: Management > 리소스 최적화
