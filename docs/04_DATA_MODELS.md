@@ -41,17 +41,43 @@ interface Task {
 }
 ```
 
-## 3. WorkLog (업무 일지)
-개별 업무에 대한 상세 수행 기록입니다.
+## 3. Resource (리소스/사용자)
 ```typescript
-interface WorkLog {
+interface Resource {
   id: string;
-  date: string;        // 기록 날짜
-  content: string;     // 수행 내용
+  loginId: string;
+  password?: string;
+  name: string;
+  organizationName: string; // 소속 기관명
+  role: string;
+  department: string;
+  email: string;
+  phone?: string;
+  status: 'Active' | 'Inactive';
+  classification: 'Admin' | 'Client' | 'Employee';
+  joinDate: string;
+  capacity: number;
+  avatar: string;
 }
 ```
 
-## 4. PerformanceReport (성과 리포트)
+## 4. UserOrganization (이용 기관)
+```typescript
+interface UserOrganization {
+  id: string;
+  name: string;
+  businessRegistrationNumber: string;
+  representativeName: string;
+  phone: string;
+  zipCode: string;
+  address: string;
+  systemAdminId: string;
+  systemAdminPassword?: string;
+  ciLogo?: string; // CI 로고 URL
+}
+```
+
+## 5. PerformanceReport (성과 리포트)
 성과 측정 및 업무 보고를 위한 데이터 모델입니다.
 ```typescript
 interface PerformanceReport {
@@ -69,20 +95,3 @@ interface PerformanceReport {
 }
 ```
 
-## 5. Resource (리소스/사용자)
-```typescript
-interface Resource {
-  id: string;
-  loginId: string;
-  name: string;
-  organizationName: string; // 소속 기관명
-  role: string;
-  department: string;
-  email: string;
-  status: 'Active' | 'Inactive';
-  classification: 'Admin' | 'Client' | 'Employee';
-  joinDate: string;
-  capacity: number;
-  avatar: string;
-}
-```

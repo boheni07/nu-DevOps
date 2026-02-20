@@ -1,39 +1,31 @@
 # API 명세 가이드 (API Specification)
 
-프론트엔드와 백엔드 간의 효율적인 데이터 통신을 위한 표준 명세 가이드입니다.
+> [!NOTE]
+> 본 문서는 현재의 클라이언트 사이드 데이터 관리 방식에서 **향후 백엔드 서비스 도입 시 적용될 표준 API 명세 제안서**입니다.
 
-## 1. API 원칙
-- **RESTful**: 리소스 중심으로 엔드포인트를 구성합니다.
-- **Versioning**: `/api/v1/...` 처럼 경로에 버전을 명시하여 변경 관리를 수행합니다.
-- **Response Format**: 모든 응답은 고정된 JSON 형식을 유지합니다.
-  ```json
-  {
-    "status": "success",
-    "data": { ... },
-    "error": null
-  }
-  ```
+## 1. API 디자인 원칙
+- **RESTful API**: 리소스 중심의 일관된 엔드포인트 구조 지향.
+- **JSON Standard**: 모든 응답은 표준 JSON 포맷을 사용하며, 메타데이터와 결과 데이터를 분리하여 제공.
+- **인증 및 보안**: JWT 기반 인증 보완 및 RBAC(Role-Based Access Control) 적용.
 
-## 2. 주요 엔드포인트 제안
+## 2. 주요 엔드포인트 제안 (Key Endpoints)
 
-### Projects
-- `GET /api/v1/projects`: 프로젝트 목록 조회
-- `POST /api/v1/projects`: 신규 프로젝트 생성
-- `GET /api/v1/projects/{id}`: 특정 프로젝트 상세 정보 및 WBS 조회
+### Projects & WBS
+- `GET /api/v1/projects`: 프로젝트 목록 및 기본 정보 조회.
+- `GET /api/v1/projects/{id}/tasks`: 특정 프로젝트의 전체 WBS 트리 조회.
+- `POST /api/v1/projects`: 신규 프로젝트 생성 (PM 권한).
 
-### Tasks
-- `PATCH /api/v1/tasks/{id}`: 업무 상태 및 진행률 업데이트
-- `DELETE /api/v1/tasks/{id}`: 업무 삭제
+### Tasks & Work Logs
+- `PATCH /api/v1/tasks/{id}`: 업무 상태, 진척률, 담당자 업데이트.
+- `POST /api/v1/tasks/{id}/logs`: 실시간 업무 수행 로그 기록 및 히스토리 관리.
 
 ### Performance Reports
-- `GET /api/v1/reports`: 본인 또는 소속 프로젝트의 리포트 목록 조회
-- `POST /api/v1/reports`: 신규 리포트 생성 및 실적 집계
-- `PATCH /api/v1/reports/{id}`: 리포트 수정, 제출(Submit) 또는 승인(Approve) 처리
+- `POST /api/v1/reports`: 업무 로그를 기반으로 한 성과 리포트 자동 생성 요청.
+- `PATCH /api/v1/reports/{id}/submit`: 리포트 제출 및 수정 제한 활성화.
+- `PATCH /api/v1/reports/{id}/approve`: PM 승인 및 실적 확정.
 
-### Work Logs
-- `POST /api/v1/tasks/{taskId}/logs`: 특정 업무에 대한 수행 로그 기록
-- `GET /api/v1/tasks/{taskId}/logs`: 업무별 로그 히스토리 조회
+## 3. 향후 아키텍처 확장 계획
+- **API Gateway**: 트래픽 관리 및 통합 인증 처리를 위한 에지 서버 도입.
+- **WebSocket**: WBS 편집 시 실시간 동기화를 위한 양방향 통신 지원 검토.
+- **AI Integration**: API 서버 측에서의 Gemini AI 모델 직접 호출 및 분석 결과 제공.
 
-## 3. 인증 및 보안
-- **JWT (JSON Web Token)**: 헤더의 `Authorization: Bearer <token>`을 통해 사용자 인증을 수행합니다.
-- **RBAC (Role-Based Access Control)**: 사용자 권한(Admin, Employee, Client)에 따른 엔드포인트 접근 권한을 서버 측에서 철저히 검증합니다.
