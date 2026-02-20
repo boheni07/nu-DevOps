@@ -341,7 +341,28 @@ const MemberManager: React.FC<MemberManagerProps> = ({ resources, setResources, 
 
                   <div>
                     <label className="block text-[12px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">소속기관명</label>
-                    <input required type="text" readOnly={formData.classification !== 'Client'} className={`w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-bold focus:border-indigo-500 focus:bg-white outline-none transition-all ${formData.classification !== 'Client' ? 'opacity-70 cursor-not-allowed text-slate-500' : ''}`} value={formData.organizationName || ''} onChange={e => setFormData({ ...formData, organizationName: e.target.value })} placeholder="소속기관 입력" />
+                    {formData.classification === 'Client' ? (
+                      <input
+                        required
+                        type="text"
+                        className="w-full px-5 py-4 bg-white border-2 border-slate-100 rounded-2xl text-sm font-bold focus:border-indigo-500 outline-none transition-all"
+                        value={formData.organizationName || ''}
+                        onChange={e => setFormData({ ...formData, organizationName: e.target.value })}
+                        placeholder="외부 소속기관 직접 입력"
+                      />
+                    ) : (
+                      <select
+                        required
+                        className="w-full px-5 py-4 bg-white border-2 border-slate-100 rounded-2xl text-sm font-bold focus:border-indigo-500 outline-none transition-all appearance-none cursor-pointer"
+                        value={formData.organizationName || ''}
+                        onChange={e => setFormData({ ...formData, organizationName: e.target.value })}
+                      >
+                        <option value="" disabled>이용기관 선택</option>
+                        {organizations.map(org => (
+                          <option key={org.id} value={org.name}>{org.name}</option>
+                        ))}
+                      </select>
+                    )}
                   </div>
 
                   <div>
