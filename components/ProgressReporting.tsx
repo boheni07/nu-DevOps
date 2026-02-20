@@ -221,18 +221,20 @@ const ProgressReporting: React.FC<ProgressReportingProps> = ({ tasks, resources,
                           className="p-4 hover:bg-slate-50 transition-all cursor-pointer group"
                         >
                           <div className="flex items-center justify-between mb-2">
-                            <span className={`px-1.5 py-0.5 text-[8px] font-black rounded-md uppercase tracking-tighter ${rep.status === 'Approved' ? 'bg-emerald-50 text-emerald-600' :
+                            <span className={`px-2 py-0.5 text-[10px] font-black rounded-md uppercase tracking-tighter ${rep.status === 'Approved' ? 'bg-emerald-50 text-emerald-600' :
                               rep.status === 'Submitted' ? 'bg-indigo-50 text-indigo-600' :
                                 'bg-slate-100 text-slate-400'
                               }`}>
                               {rep.status === 'Approved' ? '승인' : rep.status === 'Submitted' ? '보고' : '임시'}
                             </span>
-                            <span className="text-[9px] font-bold text-slate-400 tabular-nums">{rep.startDate}</span>
+                            <span className="text-[10px] font-bold text-slate-400 tabular-nums">
+                              {rep.type === '일간' ? rep.startDate : `${rep.startDate} ~ ${rep.endDate}`}
+                            </span>
                           </div>
-                          <div className="text-[11px] font-black text-slate-700 truncate group-hover:text-indigo-600 transition-colors">
+                          <div className="text-[13px] font-black text-slate-700 truncate group-hover:text-indigo-600 transition-colors">
                             {projects.find(p => p.id === rep.projectId)?.name || '전체 프로젝트'}
                           </div>
-                          <div className="text-[9px] text-slate-400 mt-1 truncate italic">
+                          <div className="text-[11px] text-slate-400 mt-1.5 truncate italic leading-relaxed">
                             {rep.summary || '종합 의견 없음'}
                           </div>
                         </div>
