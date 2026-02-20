@@ -3,6 +3,7 @@ export type Priority = 'High' | 'Medium' | 'Low';
 export type Status = 'To Do' | 'In Progress' | 'Review' | 'Done' | 'Blocked' | 'Start Delayed' | 'End Delayed';
 export type MemberStatus = 'Active' | 'Inactive';
 export type ResourceClassification = 'Admin' | 'Client' | 'Employee';
+export type Position = 'Manager' | 'Team Leader' | 'Team Member';
 
 export type ProjectStatus = 'Planning' | 'Active' | 'On Hold' | 'Completed';
 
@@ -37,6 +38,7 @@ export interface Resource {
   name: string;
   organizationName: string; // 소속기관명 추가
   role: string;
+  position?: Position;
   department: string;
   email: string;
   phone?: string;

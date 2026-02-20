@@ -1,6 +1,6 @@
 
 import React, { useState, useRef } from 'react';
-import { Resource, MemberStatus, ResourceClassification, UserOrganization } from '../types';
+import { Resource, MemberStatus, ResourceClassification, UserOrganization, Position } from '../types';
 import { ICONS } from '../constants';
 
 interface MemberManagerProps {
@@ -110,6 +110,7 @@ const MemberManager: React.FC<MemberManagerProps> = ({ resources, setResources, 
       phone: '',
       status: 'Active',
       classification: 'Employee',
+      position: 'Team Member',
       organizationName: organizations[0]?.name || '(주)넥서스 테크놀로지',
       joinDate: new Date().toISOString().split('T')[0],
       capacity: 40,
@@ -202,10 +203,12 @@ const MemberManager: React.FC<MemberManagerProps> = ({ resources, setResources, 
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-slate-50/50 border-b border-slate-200">
-              <th className="py-5 pl-8 pr-3 text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">회원 정보</th>
-              <th className="px-3 py-5 text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">분류</th>
-              <th className="px-3 py-5 text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">부서 / 역할</th>
-              <th className="px-3 py-5 text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">연락처 / Login ID</th>
+              <th className="py-5 pl-8 pr-3 text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">성명</th>
+              <th className="px-3 py-5 text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">로그인 ID</th>
+              <th className="px-3 py-5 text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">분류 / 소속기관</th>
+              <th className="px-3 py-5 text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">부서 / 조직</th>
+              <th className="px-3 py-5 text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">직책 / 역할</th>
+              <th className="px-3 py-5 text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">연락처</th>
               <th className="px-3 py-5 text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">상태</th>
               <th className="pr-8 py-5 text-right text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">액션</th>
             </tr>
@@ -215,26 +218,35 @@ const MemberManager: React.FC<MemberManagerProps> = ({ resources, setResources, 
               <tr key={res.id} className="border-b border-slate-50 hover:bg-slate-50/80 transition-colors group">
                 <td className="py-4 pl-8 pr-3">
                   <div className="flex items-center gap-4">
-                    <img src={res.avatar} className="w-10 h-10 rounded-xl border border-slate-200 shadow-sm object-cover group-hover:scale-105 transition-transform" alt={res.name} />
-                    <div>
-                      <div className="text-sm font-bold text-slate-800">{res.name}</div>
-                      <div className="text-[11px] text-slate-400 font-medium truncate max-w-[160px]">{res.email}</div>
-                    </div>
+                    <img src={res.avatar} className="w-9 h-9 rounded-xl border border-slate-200 shadow-sm object-cover group-hover:scale-105 transition-transform" alt={res.name} />
+                    <div className="text-sm font-bold text-slate-800">{res.name}</div>
                   </div>
+                </td>
+                <td className="px-3 py-4">
+                  <div className="text-[11px] text-indigo-500 font-black tracking-tight uppercase">{res.loginId}</div>
                 </td>
                 <td className="px-3 py-4">
                   <span className={`px-2.5 py-1 rounded-lg border text-[10px] font-black uppercase tracking-wider ${getClassificationStyle(res.classification)}`}>
                     {res.classification === 'Admin' ? '관리자' : res.classification === 'Client' ? '고객' : '임직원'}
                   </span>
-                  <div className="text-[11px] text-slate-500 font-medium mt-1 truncate max-w-[100px]">{res.organizationName}</div>
+                  <div className="text-[11px] text-slate-500 font-medium mt-1 truncate max-w-[150px]">{res.organizationName}</div>
                 </td>
                 <td className="px-3 py-4">
                   <div className="text-sm text-slate-700 font-bold">{res.department}</div>
-                  <div className="text-[11px] text-slate-400 font-medium uppercase tracking-tight">{res.role}</div>
                 </td>
                 <td className="px-3 py-4">
-                  <div className="text-sm text-slate-600 font-mono tracking-tighter">{res.phone || '-'}</div>
-                  <div className="text-[11px] text-indigo-500 font-black tracking-tight uppercase">ID: {res.loginId}</div>
+                  <div className="flex flex-col gap-0.5">
+                    {res.position && (
+                      <div className="text-[10px] font-black text-indigo-500 uppercase tracking-widest mb-0.5">
+                        {res.position === 'Manager' ? '관리' : res.position === 'Team Leader' ? '팀장' : '팀원'}
+                      </div>
+                    )}
+                    <div className="text-[11px] text-slate-400 font-medium uppercase tracking-tight">{res.role}</div>
+                  </div>
+                </td>
+                <td className="px-3 py-4">
+                  <div className="text-sm text-slate-600 font-mono tracking-tighter mb-0.5">{res.phone || '-'}</div>
+                  <div className="text-[10px] text-slate-400 font-medium truncate max-w-[150px]">{res.email}</div>
                 </td>
                 <td className="px-3 py-4">
                   <span className={`px-2.5 py-1 rounded-full text-[11px] font-black ${getStatusStyle(res.status)}`}>
@@ -370,9 +382,26 @@ const MemberManager: React.FC<MemberManagerProps> = ({ resources, setResources, 
                     <input type="text" className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-bold focus:border-indigo-500 focus:bg-white outline-none transition-all" value={formData.department || ''} onChange={e => setFormData({ ...formData, department: e.target.value })} />
                   </div>
 
-                  <div>
+                  <div className="col-span-2">
                     <label className="block text-[12px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">직책 / 역할</label>
-                    <input type="text" className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-bold focus:border-indigo-500 focus:bg-white outline-none transition-all" value={formData.role || ''} onChange={e => setFormData({ ...formData, role: e.target.value })} />
+                    {(formData.classification === 'Employee' || formData.classification === 'Admin') ? (
+                      <div className="grid grid-cols-3 gap-2 mb-4">
+                        {(['Manager', 'Team Leader', 'Team Member'] as Position[]).map(pos => (
+                          <button
+                            key={pos}
+                            type="button"
+                            onClick={() => setFormData({ ...formData, position: pos })}
+                            className={`py-3 rounded-xl border-2 text-[11px] font-black transition-all ${formData.position === pos
+                              ? 'border-indigo-600 bg-indigo-50 text-indigo-600 shadow-md'
+                              : 'border-slate-100 bg-slate-50 text-slate-400 hover:border-slate-200'
+                              }`}
+                          >
+                            {pos === 'Manager' ? '관리' : pos === 'Team Leader' ? '팀장' : '팀원'}
+                          </button>
+                        ))}
+                      </div>
+                    ) : null}
+                    <input type="text" placeholder="실제 직책 또는 역할 기술 (예: 백엔드 개발자)" className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-bold focus:border-indigo-500 focus:bg-white outline-none transition-all" value={formData.role || ''} onChange={e => setFormData({ ...formData, role: e.target.value })} />
                   </div>
 
                   <div>

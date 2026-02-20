@@ -82,10 +82,10 @@ const INITIAL_TASKS: Task[] = [
 ];
 
 const INITIAL_RESOURCES: Resource[] = [
-  { id: 'admin', loginId: 'admin', password: '0000', name: '시스템 관리자', organizationName: '(주)넥서스 테크놀로지', role: 'Chief Administrator', department: 'IT 거버넌스', email: 'admin@nexus.dev', status: 'Active', classification: 'Admin', joinDate: '2024-01-01', capacity: 999, avatar: 'https://picsum.photos/seed/admin/100/100' },
-  { id: 'r1', loginId: 'chulsoo', password: 'password1', name: '김철수', organizationName: '(주)넥서스 테크놀로지', role: '시스템 아키텍트', department: '플랫폼본부', email: 'chulsoo@nexus.dev', status: 'Active', classification: 'Employee', joinDate: '2023-05-15', capacity: 40, avatar: 'https://picsum.photos/seed/alex/100/100' },
-  { id: 'r2', loginId: 'younghee', password: 'password1', name: '이영희', organizationName: '(주)넥서스 테크놀로지', role: '프론트엔드 리드', department: '개발1팀', email: 'younghee@nexus.dev', status: 'Active', classification: 'Employee', joinDate: '2023-06-20', capacity: 40, avatar: 'https://picsum.photos/seed/sarah/100/100' },
-  { id: 'r3', loginId: 'jimin', password: 'password1', name: '박지민', organizationName: '(주)넥서스 테크놀로지', role: '풀스택 개발자', department: '개발2팀', email: 'jimin@nexus.dev', status: 'Inactive', classification: 'Employee', joinDate: '2024-01-10', capacity: 40, avatar: 'https://picsum.photos/seed/david/100/100' },
+  { id: 'admin', loginId: 'admin', password: '0000', name: '시스템 관리자', organizationName: '(주)넥서스 테크놀로지', role: 'Chief Administrator', position: 'Manager', department: 'IT 거버넌스', email: 'admin@nexus.dev', status: 'Active', classification: 'Admin', joinDate: '2024-01-01', capacity: 999, avatar: 'https://picsum.photos/seed/admin/100/100' },
+  { id: 'r1', loginId: 'chulsoo', password: 'password1', name: '김철수', organizationName: '(주)넥서스 테크놀로지', role: '시스템 아키텍트', position: 'Team Leader', department: '플랫폼본부', email: 'chulsoo@nexus.dev', status: 'Active', classification: 'Employee', joinDate: '2023-05-15', capacity: 40, avatar: 'https://picsum.photos/seed/alex/100/100' },
+  { id: 'r2', loginId: 'younghee', password: 'password1', name: '이영희', organizationName: '(주)넥서스 테크놀로지', role: '프론트엔드 리드', position: 'Team Member', department: '개발1팀', email: 'younghee@nexus.dev', status: 'Active', classification: 'Employee', joinDate: '2023-06-20', capacity: 40, avatar: 'https://picsum.photos/seed/sarah/100/100' },
+  { id: 'r3', loginId: 'jimin', password: 'password1', name: '박지민', organizationName: '(주)넥서스 테크놀로지', role: '풀스택 개발자', position: 'Team Member', department: '개발2팀', email: 'jimin@nexus.dev', status: 'Inactive', classification: 'Employee', joinDate: '2024-01-10', capacity: 40, avatar: 'https://picsum.photos/seed/david/100/100' },
   { id: 'r4', loginId: 'client1', password: 'password1', name: '이발주', organizationName: '글로벌 테크', role: 'PM', department: '글로벌 테크', email: 'client@globaltech.com', status: 'Active', classification: 'Client', joinDate: '2024-01-01', capacity: 0, avatar: 'https://picsum.photos/seed/client/100/100' },
 ];
 
@@ -176,6 +176,7 @@ const AppContent: React.FC<{
   }
 
   const isStaff = currentUser.classification === 'Admin' || currentUser.classification === 'Employee';
+  const isManagerOrTL = currentUser.classification === 'Admin' || currentUser.position === 'Team Leader' || currentUser.position === 'Manager';
   const mainOrg = organizations[0];
 
   return (
@@ -226,7 +227,7 @@ const AppContent: React.FC<{
             </div>
           </div>
 
-          {isStaff && (
+          {isManagerOrTL && (
             <div>
               <div className="px-3 mb-2 text-[11px] font-black text-indigo-500 uppercase tracking-widest">Management</div>
               <div className="space-y-0.5">

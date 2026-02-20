@@ -141,11 +141,30 @@ const ProgressReporting: React.FC<ProgressReportingProps> = ({ tasks, resources,
     return new Set(generatedReport.logs.map(i => i.task.id)).size;
   }, [generatedReport]);
 
-  // 취합 대상 보고서 (PM용)
+  // 취합 대상 보고서 (Admin 또는 부서 팀장용)
   const pendingReports = useMemo(() => {
-    if (currentUser?.classification !== 'Admin' && !projects.some(p => p.managerId === currentUser?.id)) return [];
-    return reports.filter(r => r.status === 'Submitted');
-  }, [reports, currentUser, projects]);
+    if (!currentUser) return [];
+
+    // Admin 계정은 모든 Submitted 리포트를 볼 수 있음
+    if (currentUser.classification === 'Admin') {
+      return reports.filter(r => r.status === 'Submitted');
+    }
+
+    // 팀장인 경우 본인 부서원의 Submitted 리포트를 볼 수 있음
+    if (currentUser.position === 'Team Leader') {
+      return reports.filter(r => {
+        const reporter = resources.find(res => res.id === r.reporterId);
+        return r.status === 'Submitted' && reporter?.department === currentUser.department;
+      });
+    }
+
+    // 프로젝트 매니저(PM)로서의 권한 (기존 로직 유지 가능성 고려)
+    if (projects.some(p => p.managerId === currentUser.id)) {
+      return reports.filter(r => r.status === 'Submitted' && projects.find(p => p.id === r.projectId)?.managerId === currentUser.id);
+    }
+
+    return [];
+  }, [reports, currentUser, projects, resources]);
 
   return (
     <div className="max-w-6xl mx-auto">
